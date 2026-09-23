@@ -81,30 +81,6 @@
   },
   {
    "id": 4,
-   "type": "text",
-   "show": "THE CONVERSATION",
-   "title": "Crocuses Are Blooming Early — What This Means for Nature",
-   "tune": "95%",
-   "available": true,
-   "credit": "Lionel Smith, Anglia Ruskin University — republished from The Conversation under CC BY-ND",
-   "paragraphs": [
-    "Amid the wet and grey gloom of February, gardeners across the UK are reporting that crocuses are pushing through their lawns and borders weeks ahead of schedule. This phenomenon is no quirk of nature. Crocuses flowering early in 2026 is a sign of shifting seasons, driven by a unique combination of biological triggers and record-breaking UK weather patterns.",
-    "Crocuses are {thermoperiodic} plants, which means they rely on temperature cues rather than day length to dictate their lifecycle. Their {corms} also usually need a cold spell in autumn to prompt an annual reset before they will start to grow toward flowering around March.",
-    "In a typical year, this process unfolds gradually. But if soil temperatures stay mild in autumn and through December and January, as they have this winter, the reset button is not hit and crocuses can reach their flowering threshold far sooner, emerging in late January and early February rather than March.",
-    "No cold reset usually means a \"blind\" corm — one that produces leaves but no flowers. Met Office data shows the UK has three weeks fewer ground frosts annually compared to 50 years ago, preventing some plants from entering their normal state of {dormancy} over winter.",
-    "There are other influences beyond climate change that may {amplify} this early flowering. City plants can bloom days earlier than rural ones, as concrete and asphalt trap daytime heat. Light pollution in cities may mimic longer days, disrupting plant circadian rhythms. And soil microbiome communities that thrive in warmer weather may boost flowering too.",
-    "This early crocus bloom may seem delightful after months of drab grey winter, but gardeners should be wary of weather reversals. Buds and flowers are more exposed if colder conditions return, meaning they may wither. Their purple and yellow petals, pushing through in January and February rather than March, are as clear a signal as any thermometer."
-   ],
-   "gloss": {
-    "thermoperiodic": "responding to changes in temperature rather than day length",
-    "corms": "underground plant stems that store food, similar to bulbs",
-    "dormancy": "a resting state in which growth and activity slow down or stop",
-    "amplify": "to increase the size, strength, or effect of something"
-   },
-   "sourceName": "The Conversation"
-  },
-  {
-   "id": 5,
    "type": "video",
    "media": "video",
    "show": "VOA LEARNING ENGLISH",
@@ -117,7 +93,7 @@
    "credit": "Voice of America — VOA Learning English video, Feb. 1, 2022 · Public Domain"
   },
   {
-   "id": 6,
+   "id": 5,
    "type": "video",
    "media": "video",
    "show": "NASA / JPL",
@@ -130,7 +106,7 @@
    "credit": "NASA Jet Propulsion Laboratory — monthly skywatching guide, Jan. 27, 2026 · Public Domain"
   },
   {
-   "id": 7,
+   "id": 6,
    "type": "video",
    "media": "audio",
    "show": "WORDS AND THEIR STORIES",
@@ -143,7 +119,7 @@
    "credit": "Voice of America — Ask a Teacher audio of the same lesson (#3), Aug. 30, 2024 · Public Domain"
   },
   {
-   "id": 8,
+   "id": 7,
    "type": "video",
    "media": "audio",
    "show": "LIBRIVOX AUDIOBOOK",
@@ -156,7 +132,7 @@
    "credit": "Aesop & Thomas Bewick, Fables of Aesop and Others — LibriVox volunteer recording · Public Domain"
   },
   {
-   "id": 9,
+   "id": 8,
    "type": "video",
    "media": "audio",
    "show": "HISTORIC SPEECH",

@@ -169,35 +169,110 @@ def voa_media(show, feed, kind, used):
     return None
 
 
-# ---------- The Conversation ----------
-def conversation(used):
-    feed = get("https://theconversation.com/global/articles.atom").text
-    for entry in re.findall(r"<entry>(.*?)</entry>", feed, re.S):
-        link = re.search(r'<link[^>]*rel="alternate"[^>]*href="([^"]+)"', entry) or re.search(r'<link[^>]*href="([^"]+)"', entry)
-        url = link.group(1)
-        key = "tc:" + url
-        if key in used:
+def rss_items(url):
+    xml = get(url).text.replace("<![CDATA[", "").replace("]]>", "")
+    for it in re.findall(r"<item>(.*?)</item>", xml, re.S):
+        field = lambda tag: (re.search(rf"<{tag}[^>]*>(.*?)</{tag}>", it, re.S) or [None, ""])[1]
+        yield {"title": clean(field("title")), "link": field("link").strip(), "author": clean(field("dc:creator")),
+               "date": field("pubDate").strip(), "body": field("content:encoded")}
+
+
+def is_sentence(p):
+    """메뉴·사진 설명이 아닌 본문 문장인지: 충분히 길고 문장 부호로 끝난다."""
+    glued = len(re.findall(r"[a-z][A-Z]", p))  # "ScienceEarth ObservatoryImage..." 같은 메뉴 글자
+    return len(p) > 60 and p.rstrip()[-1] in '.!?"”’)' and glued < 3
+
+
+def rss_date(value):
+    try:
+        return datetime.strptime(value[:16], "%a, %d %b %Y").strftime("%Y-%m-%d")
+    except ValueError:
+        return ""
+
+
+# ---------- NASA Science 기사 (퍼블릭 도메인) ----------
+def nasa_science(used):
+    for it in rss_items("https://science.nasa.gov/feed/"):
+        key = "nsci:" + it["link"]
+        if key in used or it["title"].startswith("APOD"):
             continue
         used.add(key)
-        content = re.search(r"<content[^>]*>(.*?)</content>", entry, re.S)
-        if not content:
-            continue
-        body = html.unescape(content.group(1))
-        paragraphs = [clean(p) for p in re.findall(r"<p[^>]*>(.*?)</p>", body, re.S)]
-        paragraphs = [p for p in paragraphs if p]
+        paragraphs = [clean(p) for p in re.findall(r"<p[^>]*>(.*?)</p>", it["body"], re.S)]
+        paragraphs = [p for p in paragraphs if is_sentence(p)][:12]
         if len(paragraphs) < 4:
             continue
-        title = clean(re.search(r"<title[^>]*>(.*?)</title>", entry, re.S).group(1))
-        author = clean(re.search(r"<name>(.*?)</name>", entry, re.S).group(1)) if "<name>" in entry else "The Conversation"
         return {
-            "type": "text", "show": "THE CONVERSATION", "title": title, "paragraphs": paragraphs, "gloss": {},
-            "source": url, "sourceName": "The Conversation",
-            "credit": f"{author} — republished from The Conversation under CC BY-ND 4.0",
+            "type": "text", "show": "NASA SCIENCE", "title": it["title"], "paragraphs": paragraphs, "gloss": {},
+            "source": it["link"], "sourceName": "NASA Science",
+            "credit": f"{it['author'] or 'NASA'} — NASA Science, {rss_date(it['date'])} · Public Domain",
         }
     return None
 
 
-# ---------- NASA ----------
+# ---------- Global Voices (CC BY 3.0) ----------
+def global_voices(used):
+    for it in rss_items("https://globalvoices.org/feed/"):
+        key = "gv:" + it["link"]
+        if key in used:
+            continue
+        used.add(key)
+        text = clean(it["body"])
+        # 다른 매체 기사를 옮겨 실은 글은 CC BY가 아닐 수 있어서 제외
+        if re.search(r"originally (published|appeared) (in|on|by) (?!Global Voices)|content partnership|republished on Global Voices", text, re.I):
+            continue
+        paragraphs = [clean(p) for p in re.findall(r"<p[^>]*>(.*?)</p>", it["body"], re.S)]
+        paragraphs = [p for p in paragraphs if is_sentence(p)
+                      and not re.search(r"^(screenshot|photo|image)|image via|fair use|\bCC BY", p, re.I)][:12]
+        if len(paragraphs) < 4:
+            continue
+        return {
+            "type": "text", "show": "GLOBAL VOICES", "title": it["title"], "paragraphs": paragraphs, "gloss": {},
+            "source": it["link"], "sourceName": "Global Voices",
+            "credit": f"{it['author'] or 'Global Voices'} — Global Voices, {rss_date(it['date'])} · CC BY 3.0 (excerpt)",
+        }
+    return None
+
+
+# ---------- Simple English Wikipedia 우수 문서 (CC BY-SA 4.0) ----------
+def simple_wikipedia(used):
+    api = "https://simple.wikipedia.org/w/api.php"
+    titles = []
+    for cat in ("Category:Very good articles", "Category:Good articles"):
+        res = get(api, params={"action": "query", "list": "categorymembers", "cmtitle": cat,
+                               "cmlimit": 500, "cmnamespace": 0, "format": "json"}).json()
+        titles += [m["title"] for m in res["query"]["categorymembers"]]
+    random.shuffle(titles)
+    for title in titles:
+        key = "sw:" + title
+        if key in used:
+            continue
+        used.add(key)
+        page = get(api, params={"action": "query", "prop": "extracts", "explaintext": 1,
+                                "titles": title, "format": "json"}).json()
+        text = next(iter(page["query"]["pages"].values())).get("extract", "")
+        paragraphs = []
+        for line in text.split("\n"):
+            # 발음기호가 빠지고 남은 빈 괄호, IPA가 든 괄호 정리
+            line = re.sub(r"\(\s*\)", "", line)
+            line = re.sub(r"\((?:[^();]*(?:\[[^\]]*\]|\b(?:UK|US):)[^();]*;\s*)+", "(", line)
+            line = re.sub(r"\([^()]*(?:\[[^\]]*\]|\b(?:UK|US):)[^()]*\)", "", line)
+            line = re.sub(r"\(\s*[;,]?\s*\)", "", line)
+            line = re.sub(r"\s+([,.;])", r"\1", re.sub(r"\s{2,}", " ", line)).strip()
+            if len(line) > 60 and not line.startswith("="):
+                paragraphs.append(line)
+        paragraphs = paragraphs[:10]
+        if len(paragraphs) < 4:
+            continue
+        return {
+            "type": "text", "show": "SIMPLE WIKIPEDIA", "title": title, "paragraphs": paragraphs, "gloss": {},
+            "source": "https://simple.wikipedia.org/wiki/" + title.replace(" ", "_"),
+            "sourceName": "Simple English Wikipedia",
+            "credit": "Simple English Wikipedia contributors · CC BY-SA 4.0 (excerpt)",
+        }
+    return None
+
+
+# ---------- NASA 영상 ----------
 def nasa(used):
     year = datetime.now(KST).year
     items = []
@@ -243,6 +318,8 @@ def librivox(used):
                 url = (s.get("listen_url") or "").replace("http://", "https://")
                 key = "lv:" + url
                 if not url or key in used or not (180 <= int(s.get("playtime") or 0) <= 900):
+                    continue
+                if re.search(r"dramatis personae|table of contents|\bcontents\b|\bindex\b|list of", s.get("title") or "", re.I):
                     continue
                 used.add(key)
                 authors = ", ".join(f"{a['first_name']} {a['last_name']}".strip() for a in b.get("authors", [])) or "Unknown"
@@ -294,7 +371,7 @@ def build(used, rng):
     text_shows = list(VOA_TEXT_FEEDS.items())
     rng.shuffle(text_shows)
     for show, feed in text_shows:
-        if len(programs) == 3:
+        if len(programs) == 2:
             break
         try:
             p = voa_text(show, feed, used)
@@ -303,13 +380,13 @@ def build(used, rng):
         except Exception as e:
             print("VOA text failed:", show, e)
 
-    for fn in (conversation,):
+    for fn in (nasa_science, global_voices, simple_wikipedia):
         try:
             p = fn(used)
             if p:
                 programs.append(p)
         except Exception as e:
-            print("Conversation failed:", e)
+            print(fn.__name__, "failed:", e)
 
     listening = []
     for show, feed in reversed(text_shows):
@@ -368,7 +445,7 @@ def main():
     state = load(STATE, {"used": []})
     used = set(state["used"])
     programs = build(used, random.Random(today))
-    if len(programs) < 6:
+    if len(programs) < 7:
         sys.exit(f"too few programs ({len(programs)}); keeping previous edition")
 
     index = load(ARCHIVE / "index.json", {"editions": []})
