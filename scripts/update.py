@@ -1,10 +1,10 @@
-"""2일마다 새 프로그램 목록(data/current.json)을 만들고 이전 목록은 data/archive/에 남긴다.
+"""매일 새 프로그램 목록(data/current.json)을 만들고 이전 목록은 data/archive/에 남긴다.
 
 - 뉴스 듣기: BBC·NPR 팟캐스트의 최신 편 (원래 서버의 파일을 그대로 재생)
 - 헤드라인: BBC·NPR RSS의 제목·요약·썸네일 (본문은 원문 사이트에서 읽음)
 
 사용법:
-  python scripts/update.py           # 마지막 목록이 2일 이상 지났을 때만 갱신
+  python scripts/update.py           # 오늘 목록이 아직 없을 때만 갱신
   python scripts/update.py --force   # 바로 갱신
 """
 import html
@@ -22,7 +22,7 @@ DATA = ROOT / "data"
 ARCHIVE = DATA / "archive"
 CURRENT = DATA / "current.json"
 STATE = DATA / "state.json"
-INTERVAL_DAYS = 2
+INTERVAL_DAYS = 1
 KST = timezone(timedelta(hours=9))
 HEADERS = {"User-Agent": "OnAirEnglish/1.0 (English-learning web app; GitHub Actions)"}
 

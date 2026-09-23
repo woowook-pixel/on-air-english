@@ -2,7 +2,7 @@ name: Update programs and deploy
 
 on:
   schedule:
-    - cron: "0 21 * * *"   # 매일 06:00 KST에 확인, 마지막 목록이 2일 지났을 때만 갱신
+    - cron: "0 21 * * *"   # 매일 06:00 KST에 새 목록 생성
   workflow_dispatch:
     inputs:
       force:
