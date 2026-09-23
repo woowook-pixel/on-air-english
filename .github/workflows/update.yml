@@ -1,0 +1,52 @@
+name: Update programs and deploy
+
+on:
+  schedule:
+    - cron: "0 21 * * *"   # 매일 06:00 KST에 확인, 마지막 목록이 2일 지났을 때만 갱신
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "지금 바로 새 목록 만들기"
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  update-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update program list
+        if: github.event_name != 'push'
+        run: |
+          pip install requests
+          python scripts/update.py ${{ inputs.force && '--force' || '' }}
+
+      - name: Commit new list
+        if: github.event_name != 'push'
+        run: |
+          git config user.name "on-air-bot"
+          git config user.email "on-air-bot@users.noreply.github.com"
+          git add data
+          git diff --cached --quiet || (git commit -m "Update program list $(TZ=Asia/Seoul date +%F)" && git push)
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deploy
+        uses: actions/deploy-pages@v4

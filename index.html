@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>On Air English</title>
+<meta name="description" content="2일마다 새로 바뀌는 영어 읽기·듣기 자료">
+<meta name="theme-color" content="#12161B">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="On Air">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Literata:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #12161B; --panel: #1A2029; --panel-raised: #212A34; --line: #2B3542;
+    --ink: #EDEAE1; --ink-soft: #8E9BA8; --amber: #D9A441; --amber-dim: #3A3122; --green: #5FAE82;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #EFEAD9; --panel: #FBF8EF; --panel-raised: #FFFFFF;
+      --line: #DCD3B8; --ink: #262117; --ink-soft: #6B6250;
+      --amber: #B97D1F; --amber-dim: #F1E2BC; --green: #3E8562;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg: #EFEAD9; --panel: #FBF8EF; --panel-raised: #FFFFFF;
+    --line: #DCD3B8; --ink: #262117; --ink-soft: #6B6250;
+    --amber: #B97D1F; --amber-dim: #F1E2BC; --green: #3E8562;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); height: 100%; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0; min-height: 100%; background: var(--bg); color: var(--ink);
+    font-family: 'Space Grotesk', sans-serif; line-height: 1.5;
+  }
+  main { max-width: 560px; margin: 0 auto; padding: 18px 18px 56px; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ---------- DIAL HEADER ---------- */
+  .dial {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 22px 20px 18px; margin-bottom: 16px;
+  }
+  .dial-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+  .dial-station { font-weight: 700; font-size: 15px; letter-spacing: 0.01em; }
+  .dial-station .dot { color: var(--amber); }
+  .dial-readout { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 15px; color: var(--amber); }
+  .dial-strip {
+    position: relative; height: 34px; border-radius: 4px;
+    background: repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 14px);
+    margin-bottom: 12px; overflow: hidden;
+  }
+  .dial-strip::before {
+    content: ''; position: absolute; left: var(--tune, 62%); top: 0; bottom: 0; width: 3px;
+    background: var(--amber); box-shadow: 0 0 10px var(--amber); transition: left 0.4s ease;
+  }
+  .dial-caption { font-family: 'Literata', serif; font-size: 14.5px; color: var(--ink-soft); margin: 0; }
+
+  /* ---------- PRESET LIST ---------- */
+  .preset-list { display: flex; flex-direction: column; gap: 10px; }
+  .preset {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; cursor: pointer; text-align: left; width: 100%;
+    font-family: inherit; color: inherit;
+  }
+  .preset:disabled { cursor: default; opacity: 0.55; }
+  .preset-num {
+    flex-shrink: 0; width: 38px; height: 38px; border-radius: 8px; background: var(--panel-raised);
+    border: 1px solid var(--line); display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; color: var(--amber);
+  }
+  .preset-num.video { color: var(--green); }
+  .preset:disabled .preset-num { color: var(--ink-soft); }
+  .preset-body { flex: 1; min-width: 0; }
+  .preset-show-row { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+  .preset-show { font-size: 11.5px; font-weight: 600; color: var(--ink-soft); }
+  .preset-type {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.03em; padding: 1px 6px; border-radius: 20px;
+    background: var(--panel-raised); border: 1px solid var(--line); color: var(--ink-soft);
+  }
+  .preset-type.video { color: var(--green); border-color: var(--green); }
+  .preset-type.text { color: var(--amber); border-color: var(--amber); }
+  .preset-title { font-family: 'Literata', serif; font-size: 16px; font-weight: 600; line-height: 1.3; }
+  .preset-meta { font-size: 12px; color: var(--ink-soft); margin-top: 3px; }
+  .preset-status {
+    flex-shrink: 0; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 20px;
+    background: var(--amber-dim); color: var(--amber);
+  }
+  .preset:disabled .preset-status { background: transparent; border: 1px solid var(--line); color: var(--ink-soft); }
+  .list-note { font-size: 12.5px; color: var(--ink-soft); margin: 14px 2px 0; line-height: 1.5; }
+
+  /* ---------- DETAIL ---------- */
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 6px; background: none; border: none;
+    color: var(--ink-soft); font-family: inherit; font-size: 13.5px; font-weight: 600;
+    cursor: pointer; padding: 0 0 14px; margin: 0;
+  }
+  .back-btn:hover { color: var(--ink); }
+  .panel {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 20px; margin-bottom: 16px;
+  }
+  .panel-label {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 14px;
+    font-size: 13px; font-weight: 600; color: var(--ink-soft);
+  }
+  .panel-label .chip { width: 7px; height: 7px; border-radius: 50%; background: var(--ink-soft); flex-shrink: 0; }
+  .panel-label.live .chip { background: var(--green); box-shadow: 0 0 6px var(--green); }
+
+  .script h2 { font-family: 'Literata', serif; font-weight: 600; font-size: 22px; line-height: 1.3; margin: 0 0 4px; }
+  .script .credit { font-size: 12.5px; color: var(--ink-soft); margin: 0 0 16px; }
+  .script .body { font-family: 'Literata', serif; font-size: 16.5px; line-height: 1.72; }
+  .script .body p { margin: 0 0 14px; }
+  .gloss { position: relative; color: var(--amber); border-bottom: 1.5px dotted var(--amber); cursor: pointer; padding: 0 1px; }
+  .gloss .tip {
+    display: none; position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%);
+    width: max-content; max-width: 220px; background: var(--panel-raised); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px;
+    font-family: 'Space Grotesk', sans-serif; font-size: 12.5px; line-height: 1.4; z-index: 5;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.28);
+  }
+  .gloss.open .tip { display: block; }
+  .gloss-hint { font-size: 12px; color: var(--ink-soft); margin: 14px 0 0; }
+
+  .onair-row { display: flex; align-items: center; gap: 14px; }
+  .play-btn {
+    flex-shrink: 0; width: 52px; height: 52px; border-radius: 50%; border: none;
+    background: var(--amber); display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .play-btn .tri { width: 0; height: 0; border-style: solid; border-width: 9px 0 9px 15px; border-color: transparent transparent transparent var(--bg); margin-left: 3px; }
+  .play-btn.playing .tri { display: none; }
+  .play-btn .bars { display: none; gap: 3px; align-items: center; }
+  .play-btn.playing .bars { display: flex; }
+  .play-btn .bars span { width: 3px; height: 14px; background: var(--bg); border-radius: 2px; animation: bar 0.9s ease-in-out infinite; }
+  .play-btn .bars span:nth-child(2) { animation-delay: 0.15s; }
+  .play-btn .bars span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bar { 0%,100% { transform: scaleY(0.4); } 50% { transform: scaleY(1); } }
+  .wave { flex: 1; display: flex; align-items: center; gap: 2.5px; height: 40px; overflow: hidden; }
+  .wave span { flex: 1; min-width: 2px; background: var(--line); border-radius: 2px; transition: background 0.3s ease; }
+  .wave.live span { background: var(--amber); animation: wv 1.1s ease-in-out infinite; }
+  @keyframes wv { 0%,100% { transform: scaleY(0.5); } 50% { transform: scaleY(1); } }
+  .onair-note { font-size: 12.5px; color: var(--ink-soft); margin: 14px 0 0; line-height: 1.5; }
+
+  .edition-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 0 2px 12px; font-size: 12.5px; color: var(--ink-soft); }
+  .edition-bar.past { background: var(--amber-dim); color: var(--amber); border-radius: 8px; padding: 8px 12px; margin: 0 0 12px; }
+  .link-btn { background: none; border: none; padding: 0; font-family: inherit; font-size: 12.5px; font-weight: 600; color: var(--amber); cursor: pointer; }
+  .archive-item { display: block; width: 100%; text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; margin-bottom: 10px; cursor: pointer; font-family: inherit; color: inherit; }
+  .archive-date { font-weight: 700; font-size: 14px; color: var(--amber); }
+  .archive-titles { font-size: 12.5px; color: var(--ink-soft); margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .empty { font-size: 13px; color: var(--ink-soft); padding: 20px 2px; }
+
+  footer { max-width: 560px; margin: 0 auto; padding: 4px 18px 40px; color: var(--ink-soft); font-size: 12px; line-height: 1.55; }
+</style>
+</head>
+<body>
+
+<main>
+
+  <div class="dial">
+    <div class="dial-top">
+      <div class="dial-station"><span class="dot">●</span> ON AIR · MULTI-SOURCE</div>
+      <div class="dial-readout" id="readout"></div>
+    </div>
+    <div class="dial-strip" id="dialStrip"></div>
+    <p class="dial-caption" id="dialCaption"></p>
+  </div>
+
+  <!-- ===== LIST SCREEN ===== -->
+  <section class="screen active" id="listScreen">
+    <div class="edition-bar" id="editionBar"></div>
+    <div class="preset-list" id="presetList"></div>
+  </section>
+
+  <!-- ===== ARCHIVE SCREEN ===== -->
+  <section class="screen" id="archiveScreen">
+    <button class="back-btn" id="archiveBack">← 오늘 목록</button>
+    <div id="archiveList"></div>
+  </section>
+
+  <!-- ===== DETAIL SCREEN ===== -->
+  <section class="screen" id="detailScreen">
+    <button class="back-btn" id="backBtn">← 채널 목록</button>
+
+    <section class="panel" id="textPanel">
+      <div class="panel-label"><span class="chip"></span>읽기 자료 · 원문</div>
+      <div class="script">
+        <h2 id="scriptTitle"></h2>
+        <p class="credit" id="scriptCredit"></p>
+        <div class="body" id="scriptBody"></div>
+        <p class="gloss-hint" id="glossHint">밑줄 친 단어를 탭하면 뜻이 나옵니다.</p>
+      </div>
+    </section>
+
+    <section class="panel" id="videoPanel">
+      <div class="panel-label" id="onairLabel"><span class="chip"></span>듣기 자료 · 방송</div>
+      <h2 id="videoTitle" style="font-family:'Literata',serif; font-weight:600; font-size:20px; line-height:1.3; margin:0 0 4px;"></h2>
+      <p class="credit" id="videoCredit" style="font-size:12.5px; color:var(--ink-soft); margin:0 0 16px;"></p>
+      <div class="onair-row">
+        <button class="play-btn" id="playBtn" aria-label="재생">
+          <div class="tri"></div>
+          <div class="bars"><span></span><span></span><span></span></div>
+        </button>
+        <div class="wave" id="wave"></div>
+      </div>
+      <video id="videoEl" controls playsinline preload="metadata" style="width:100%; margin-top:14px; border-radius:8px; background:#000; display:none;"></video>
+      <audio id="audioEl" controls preload="none" style="width:100%; margin-top:14px;"></audio>
+      <p class="onair-note" id="onairNote"></p>
+    </section>
+  </section>
+
+</main>
+
+<footer>
+  출처: Voice of America · The Conversation (CC BY-ND) · NASA · LibriVox · Wikimedia Commons
+</footer>
+
+<script>
+const INTERVAL_DAYS = 2;
+let PROGRAMS = [];
+let latestId = null;
+let viewingId = null;
+
+const $ = id => document.getElementById(id);
+const listScreen = $('listScreen');
+const detailScreen = $('detailScreen');
+const archiveScreen = $('archiveScreen');
+const dialStrip = $('dialStrip');
+const dialCaption = $('dialCaption');
+const readout = $('readout');
+const editionBar = $('editionBar');
+
+function el(tag, className, text) {
+  const e = document.createElement(tag);
+  if (className) e.className = className;
+  if (text != null) e.textContent = text;
+  return e;
+}
+
+function showScreen(screen) {
+  [listScreen, detailScreen, archiveScreen].forEach(s => s.classList.toggle('active', s === screen));
+  window.scrollTo(0, 0);
+}
+
+async function fetchJSON(url) {
+  const r = await fetch(url, { cache: 'no-cache' });
+  if (!r.ok) throw new Error(r.status + ' ' + url);
+  return r.json();
+}
+
+function addDays(date, n) {
+  const d = new Date(date + 'T00:00:00');
+  d.setDate(d.getDate() + n);
+  return `${d.getMonth() + 1}월 ${d.getDate()}일`;
+}
+
+function applyEdition(ed) {
+  PROGRAMS = ed.programs;
+  viewingId = ed.id;
+  const isLatest = ed.id === latestId;
+  editionBar.className = 'edition-bar' + (isLatest ? '' : ' past');
+  editionBar.innerHTML = '';
+  if (isLatest) {
+    editionBar.append(el('span', null, `${ed.date} 목록 · 다음 업데이트 ${addDays(ed.date, INTERVAL_DAYS)}`));
+    const b = el('button', 'link-btn', '지난 목록 →');
+    b.addEventListener('click', openArchive);
+    editionBar.append(b);
+  } else {
+    editionBar.append(el('span', null, `${ed.date} 지난 목록을 보는 중`));
+    const b = el('button', 'link-btn', '오늘 목록으로');
+    b.addEventListener('click', () => loadEdition('data/current.json'));
+    editionBar.append(b);
+  }
+  renderPresetList();
+  resetDial();
+}
+
+async function loadEdition(url) {
+  try {
+    applyEdition(await fetchJSON(url));
+  } catch (e) {
+    $('presetList').replaceChildren(el('p', 'empty', '목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'));
+  }
+  showScreen(listScreen);
+}
+
+async function openArchive() {
+  const wrap = $('archiveList');
+  wrap.replaceChildren(el('p', 'empty', '불러오는 중…'));
+  showScreen(archiveScreen);
+  try {
+    const { editions } = await fetchJSON('data/archive/index.json');
+    const past = editions.filter(e => e.id !== latestId);
+    wrap.replaceChildren();
+    if (!past.length) wrap.append(el('p', 'empty', '아직 지난 목록이 없습니다.'));
+    past.forEach(e => {
+      const b = el('button', 'archive-item');
+      b.append(el('div', 'archive-date', e.id), el('div', 'archive-titles', e.titles.join(' · ')));
+      b.addEventListener('click', () => loadEdition(`data/archive/${encodeURIComponent(e.id)}.json`));
+      wrap.append(b);
+    });
+  } catch (e) {
+    wrap.replaceChildren(el('p', 'empty', '지난 목록을 불러오지 못했습니다.'));
+  }
+}
+$('archiveBack').addEventListener('click', () => showScreen(listScreen));
+
+function renderPresetList() {
+  const wrap = $('presetList');
+  wrap.replaceChildren();
+  PROGRAMS.forEach(p => {
+    const isMedia = p.type === 'video';
+    const isVideo = p.media === 'video';
+    const btn = el('button', 'preset');
+    const num = el('div', 'preset-num' + (isMedia ? ' video' : ''), isMedia ? (isVideo ? '🎬' : '🎧') : '📄');
+    const body = el('div', 'preset-body');
+    const row = el('div', 'preset-show-row');
+    row.append(el('span', 'preset-show', p.show),
+               el('span', 'preset-type ' + p.type, isMedia ? (isVideo ? '영상' : '오디오') : '텍스트'));
+    body.append(row, el('div', 'preset-title', p.title));
+    const meta = isMedia ? `${isVideo ? '영상' : '오디오'} · ${p.sourceName || ''}` : wordMeta(p);
+    if (meta) body.append(el('div', 'preset-meta', meta));
+    btn.append(num, body, el('div', 'preset-status', '연결됨'));
+    btn.addEventListener('click', () => openDetail(p));
+    wrap.append(btn);
+  });
+}
+
+function wordMeta(p) {
+  if (!p.paragraphs) return '';
+  const words = p.paragraphs.join(' ').replace(/[{}]/g, '').split(/\s+/).length;
+  const minutes = Math.max(1, Math.round(words / 130));
+  return `${minutes}분 읽기 · ${words}단어`;
+}
+
+const textPanel = $('textPanel');
+const videoPanel = $('videoPanel');
+
+function openDetail(p) {
+  dialStrip.style.setProperty('--tune', p.tune);
+  dialCaption.textContent = `${p.show} · ${p.type === 'video' ? '실제 방송을 듣습니다.' : '실제 원문을 읽습니다.'}`;
+  readout.textContent = p.type === 'video' ? (p.media === 'video' ? 'VIDEO' : 'AUDIO') : wordMeta(p).split('·')[0].trim();
+
+  if (p.type === 'video') {
+    textPanel.style.display = 'none';
+    videoPanel.style.display = '';
+    $('videoTitle').textContent = p.title;
+    $('videoCredit').textContent = p.credit;
+    loadAudio(p);
+  } else {
+    stopAudio();
+    videoPanel.style.display = 'none';
+    textPanel.style.display = '';
+    $('scriptTitle').textContent = p.title;
+    $('scriptCredit').replaceChildren(p.credit || '');
+    if (p.source) {
+      $('scriptCredit').append(' · ', sourceLink(p.source));
+    }
+    renderScript(p);
+  }
+  showScreen(detailScreen);
+}
+
+function resetDial() {
+  dialStrip.style.setProperty('--tune', '62%');
+  dialCaption.textContent = '실제 원문을 읽고, 실제 방송을 듣습니다. 프리셋을 눌러 프로그램을 골라보세요.';
+  readout.textContent = `${PROGRAMS.length} PROGRAMS`;
+}
+
+function backToList() {
+  stopAudio();
+  resetDial();
+  showScreen(listScreen);
+}
+$('backBtn').addEventListener('click', backToList);
+
+function sourceLink(href) {
+  const a = el('a', null, '원문 페이지 ↗');
+  if (/^https?:\/\//.test(href)) a.href = href;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  a.style.color = 'var(--amber)';
+  return a;
+}
+
+function renderScript(p) {
+  const body = $('scriptBody');
+  body.replaceChildren();
+  const gloss = {};
+  Object.entries(p.gloss || {}).forEach(([k, v]) => { gloss[k.toLowerCase()] = v; });
+  p.paragraphs.forEach(raw => {
+    const para = el('p');
+    raw.split(/\{([^{}]+)\}/g).forEach((chunk, i) => {
+      if (i % 2 === 0) {
+        para.append(chunk);
+        return;
+      }
+      const span = el('span', 'gloss', chunk);
+      span.append(el('span', 'tip', gloss[chunk.toLowerCase()] || ''));
+      span.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.gloss.open').forEach(g => { if (g !== span) g.classList.remove('open'); });
+        span.classList.toggle('open');
+      });
+      para.append(span);
+    });
+    body.append(para);
+  });
+  $('glossHint').style.display = Object.keys(gloss).length ? '' : 'none';
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.gloss.open').forEach(g => g.classList.remove('open'));
+});
+
+// ---------- Waveform ----------
+function renderWave() {
+  const wave = $('wave');
+  wave.replaceChildren();
+  for (let i = 0; i < 46; i++) {
+    const span = el('span');
+    span.style.height = (6 + Math.round(Math.sin(i * 0.7) * 8 + Math.random() * 10 + 8)) + 'px';
+    wave.append(span);
+  }
+}
+
+const playBtn = $('playBtn');
+const wave = $('wave');
+const onairLabel = $('onairLabel');
+const audioEl = $('audioEl');
+const videoEl = $('videoEl');
+const onairNote = $('onairNote');
+let mediaEl = audioEl;
+
+function setLive(on) {
+  playBtn.classList.toggle('playing', on);
+  wave.classList.toggle('live', on);
+  onairLabel.classList.toggle('live', on);
+}
+
+function stopAudio() {
+  [audioEl, videoEl].forEach(m => {
+    m.pause();
+    m.removeAttribute('src');
+    m.load();
+  });
+  setLive(false);
+}
+
+function loadAudio(p) {
+  stopAudio();
+  const isVideo = p.media === 'video';
+  mediaEl = isVideo ? videoEl : audioEl;
+  videoEl.style.display = isVideo ? '' : 'none';
+  audioEl.style.display = isVideo ? 'none' : '';
+  mediaEl.src = p.src;
+  onairLabel.lastChild.textContent = isVideo ? '영상 자료 · 원본' : '듣기 자료 · 원본';
+  onairNote.replaceChildren(p.source ? sourceLink(p.source) : '');
+}
+
+playBtn.addEventListener('click', () => {
+  if (mediaEl.paused) mediaEl.play().catch(() => setLive(false));
+  else mediaEl.pause();
+});
+[audioEl, videoEl].forEach(m => {
+  m.addEventListener('play', () => setLive(true));
+  m.addEventListener('pause', () => setLive(false));
+  m.addEventListener('ended', () => setLive(false));
+});
+
+renderWave();
+fetchJSON('data/current.json')
+  .then(ed => { latestId = ed.id; applyEdition(ed); })
+  .catch(() => $('presetList').replaceChildren(el('p', 'empty', '목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.')));
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
