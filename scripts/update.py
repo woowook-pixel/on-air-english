@@ -1,15 +1,18 @@
 """2일마다 새 프로그램 목록(data/current.json)을 만들고 이전 목록은 data/archive/에 남긴다.
 
+- 뉴스 듣기: BBC·NPR 팟캐스트의 최신 편 (원래 서버의 파일을 그대로 재생)
+- 헤드라인: BBC·NPR RSS의 제목·요약·썸네일 (본문은 원문 사이트에서 읽음)
+
 사용법:
   python scripts/update.py           # 마지막 목록이 2일 이상 지났을 때만 갱신
   python scripts/update.py --force   # 바로 갱신
 """
 import html
 import json
-import random
 import re
 import sys
 from datetime import datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 
 import requests
@@ -21,32 +24,24 @@ CURRENT = DATA / "current.json"
 STATE = DATA / "state.json"
 INTERVAL_DAYS = 2
 KST = timezone(timedelta(hours=9))
-
 HEADERS = {"User-Agent": "OnAirEnglish/1.0 (English-learning web app; GitHub Actions)"}
-VOA = "https://learningenglish.voanews.com"
 
-# VOA Learning English RSS 피드 (2025년 봄 이후 새 글이 없어서 과거 글을 돌려 가며 사용)
-VOA_TEXT_FEEDS = {
-    "AS IT IS": "zkm-ql-vomx-tpej-rqi",
-    "SCIENCE & TECHNOLOGY": "zmg_pl-vomx-tpeymtm",
-    "HEALTH & LIFESTYLE": "zmmpql-vomx-tpey-_q",
-    "ARTS & CULTURE": "zpyp_l-vomx-tpe_rym",
-    "WORDS AND THEIR STORIES": "zmypyl-vomx-tpeyry_",
-    "ASK A TEACHER": "zti_qvl-vomx-tpekgvqr",
-    "AMERICAN STORIES": "zyg__l-vomx-tpetmty",
-    "U.S. HISTORY": "zj_pvl-vomx-tpebb_v",
-    "EDUCATION TIPS": "z_gjqyl-vomx-tpevmrov",
-    "ALL ABOUT AMERICA": "zbmroml-vomx-tpeqboo_",
-    "AMERICA'S PRESIDENTS": "zjypq_l-vomx-tpebryqy",
-    "EDUCATION": "ztmp_l-vomx-tpek-__",
-}
-VOA_VIDEO_FEEDS = {
-    "ENGLISH IN A MINUTE": "zjk-rl-vomx-tpebpqqo",
-    "EVERYDAY GRAMMAR": "z_riqtl-vomx-tpevtmqr",
-    "HOW TO PRONOUNCE": "zpivqol-vomx-tpe_guqi",
-    "VOA60: WATCH & LEARN": "zyk-il-vomx-tpetpqqm",
-}
-NASA_SERIES = ["NASA Minute", "What's Up", "ScienceCasts", "NASA Science Live"]
+# (보여줄 이름, 출처, RSS 주소)
+PODCASTS = [
+    ("BBC GLOBAL NEWS PODCAST", "BBC", "https://podcasts.files.bbci.co.uk/p02nq0gn.rss"),
+    ("NPR NEWS NOW", "NPR", "https://feeds.npr.org/500005/podcast.xml"),
+    ("NPR UP FIRST", "NPR", "https://feeds.npr.org/510318/podcast.xml"),
+    ("BBC 6 MINUTE ENGLISH", "BBC", "https://podcasts.files.bbci.co.uk/p02pc9tn.rss"),
+    ("NPR SHORT WAVE", "NPR", "https://feeds.npr.org/510351/podcast.xml"),
+]
+# (보여줄 이름, 출처, RSS 주소, 가져올 개수)
+HEADLINES = [
+    ("BBC WORLD", "BBC News", "https://feeds.bbci.co.uk/news/world/rss.xml", 2),
+    ("BBC SCIENCE", "BBC News", "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml", 1),
+    ("BBC TECHNOLOGY", "BBC News", "https://feeds.bbci.co.uk/news/technology/rss.xml", 1),
+    ("NPR NEWS", "NPR", "https://feeds.npr.org/1001/rss.xml", 1),
+    ("NPR WORLD", "NPR", "https://feeds.npr.org/1004/rss.xml", 1),
+]
 
 
 def get(url, **kw):
@@ -56,371 +51,114 @@ def get(url, **kw):
 
 
 def clean(fragment):
-    text = html.unescape(re.sub(r"<[^>]+>", "", fragment))
+    text = html.unescape(re.sub(r"<[^>]+>", "", fragment or ""))
     return re.sub(r"\s+", " ", text).strip()
 
 
-def rss_links(feed_id):
-    xml = get(f"{VOA}/api/{feed_id}").text
-    items = re.findall(r"<item>(.*?)</item>", xml, re.S)
-    return [re.search(r"<link>(.*?)</link>", it).group(1).strip() for it in items]
+def tag(xml, name):
+    m = re.search(rf"<{name}(?:\s[^>]*)?>(.*?)</{name}>", xml, re.S)
+    return m.group(1).replace("<![CDATA[", "").replace("]]>", "").strip() if m else ""
 
 
-def mark_gloss(paragraphs, words):
-    """각 단어의 첫 등장 위치를 {word}로 감싼다. 찾지 못한 단어는 gloss에서 뺀다."""
-    found = {}
-    for word, meaning in words.items():
-        pat = re.compile(r"(?<![\w{])(" + re.escape(word) + r")(?![\w}])", re.I)
-        for i, p in enumerate(paragraphs):
-            m = pat.search(p)
-            if m:
-                paragraphs[i] = p[: m.start()] + "{" + m.group(1) + "}" + p[m.end():]
-                found[m.group(1).lower()] = meaning
-                break
-    return paragraphs, found
+def attr(xml, name, attribute):
+    m = re.search(rf'<{name}\b[^>]*\b{attribute}="([^"]+)"', xml)
+    return html.unescape(m.group(1)) if m else ""
 
 
-# ---------- VOA ----------
-def voa_article(url):
-    page = get(url).text
-    title = clean(re.search(r"<title>(.*?)</title>", page, re.S).group(1))
-    title = re.sub(r"\s*[|-]\s*VOA Learning English\s*$", "", title).strip()
-    media = sorted(set(re.findall(r"https://[^\"\s&]+?\.(?:mp3|mp4)", page)))
-    date = re.search(r'"datePublished":"(\d{4}-\d{2}-\d{2})', page)
-    start = max(page.find('class="wsw"'), 0)
-    wits = page.find("Words in This Story", start)
-    body = page[start: wits if wits > 0 else len(page)] if start else ""
-    paragraphs = []
-    for raw in re.findall(r"<p[^>]*>(.*?)</p>", body, re.S):
-        t = clean(raw)
-        if not t or "No media source" in t or set(t) <= set("_-— "):
-            continue
-        paragraphs.append(t)
-    gloss = {}
-    if wits > 0:
-        block = page[wits: page.find("</div>", wits)]
-        for raw in re.findall(r"<p[^>]*>(.*?)</p>", block, re.S):
-            m = re.match(r"\s*<strong>(.*?)</strong>(.*)", raw, re.S)
-            if not m:
-                continue
-            word = clean(m.group(1))
-            meaning = clean(m.group(2))
-            meaning = re.sub(r"^[\s\-–—:]*(\(?\s*(n|v|adj|adv|phrase|idiom|noun|verb|expression|phrasal verb)\.?\s*\)?\.?\s*)?", "", meaning, flags=re.I)
-            if word and meaning and len(word) < 40:
-                gloss[word] = meaning[:220]
-    return {
-        "url": url, "title": title, "paragraphs": paragraphs, "gloss": gloss,
-        "mp3": pick_mp3(media), "mp4": pick_mp4(media),
-        "date": date.group(1) if date else "",
-    }
+def feed(url):
+    xml = get(url).text
+    channel = xml.split("<item>")[0]
+    return channel, re.findall(r"<item>(.*?)</item>", xml, re.S)
 
 
-def pick_mp3(media):
-    mp3 = [m for m in media if m.endswith(".mp3")]
-    hq = [m for m in mp3 if m.endswith("_hq.mp3")]
-    return (hq or mp3 or [None])[0]
-
-
-def pick_mp4(media):
-    mp4 = [m for m in media if m.endswith(".mp4")]
-    for suffix in ("_480p.mp4", "_720p.mp4"):
-        hit = [m for m in mp4 if m.endswith(suffix)]
-        if hit:
-            return hit[0]
-    base = [m for m in mp4 if not re.search(r"_(\d+p|fullhd|hq)\.mp4$", m)]
-    return (base or mp4 or [None])[0]
-
-
-def voa_text(show, feed, used):
-    for url in rss_links(feed):
-        key = "voa:" + url
-        if key in used:
-            continue
-        a = voa_article(url)
-        if not a or len(a["paragraphs"]) < 4:
-            used.add(key)
-            continue
-        paragraphs = a["paragraphs"][:14]
-        paragraphs, gloss = mark_gloss(paragraphs, a["gloss"])
-        used.add(key)
-        return {
-            "type": "text", "show": show, "title": a["title"], "paragraphs": paragraphs, "gloss": gloss,
-            "source": url, "sourceName": "VOA Learning English",
-            "credit": f"Voice of America — VOA Learning English, {a['date']} · Public Domain",
-        }
-    return None
-
-
-def voa_media(show, feed, kind, used):
-    for url in rss_links(feed):
-        key = "voa:" + url
-        if key in used:
-            continue
-        a = voa_article(url)
-        used.add(key)
-        src = a and (a["mp4"] if kind == "video" else a["mp3"])
-        if not src:
-            continue
-        return {
-            "type": "video", "media": kind, "show": show, "title": a["title"], "src": src,
-            "source": url, "sourceName": "VOA Learning English",
-            "credit": f"Voice of America — VOA Learning English {kind}, {a['date']} · Public Domain",
-        }
-    return None
-
-
-def rss_items(url):
-    xml = get(url).text.replace("<![CDATA[", "").replace("]]>", "")
-    for it in re.findall(r"<item>(.*?)</item>", xml, re.S):
-        field = lambda tag: (re.search(rf"<{tag}[^>]*>(.*?)</{tag}>", it, re.S) or [None, ""])[1]
-        yield {"title": clean(field("title")), "link": field("link").strip(), "author": clean(field("dc:creator")),
-               "date": field("pubDate").strip(), "body": field("content:encoded")}
-
-
-def is_sentence(p):
-    """메뉴·사진 설명이 아닌 본문 문장인지: 충분히 길고 문장 부호로 끝난다."""
-    glued = len(re.findall(r"[a-z][A-Z]", p))  # "ScienceEarth ObservatoryImage..." 같은 메뉴 글자
-    return len(p) > 60 and p.rstrip()[-1] in '.!?"”’)' and glued < 3
-
-
-def rss_date(value):
+def iso_date(value):
     try:
-        return datetime.strptime(value[:16], "%a, %d %b %Y").strftime("%Y-%m-%d")
-    except ValueError:
+        return parsedate_to_datetime(value).astimezone(KST).strftime("%Y-%m-%d")
+    except (TypeError, ValueError):
         return ""
 
 
-# ---------- NASA Science 기사 (퍼블릭 도메인) ----------
-def nasa_science(used):
-    for it in rss_items("https://science.nasa.gov/feed/"):
-        key = "nsci:" + it["link"]
-        if key in used or it["title"].startswith("APOD"):
-            continue
-        used.add(key)
-        paragraphs = [clean(p) for p in re.findall(r"<p[^>]*>(.*?)</p>", it["body"], re.S)]
-        paragraphs = [p for p in paragraphs if is_sentence(p)][:12]
-        if len(paragraphs) < 4:
-            continue
-        return {
-            "type": "text", "show": "NASA SCIENCE", "title": it["title"], "paragraphs": paragraphs, "gloss": {},
-            "source": it["link"], "sourceName": "NASA Science",
-            "credit": f"{it['author'] or 'NASA'} — NASA Science, {rss_date(it['date'])} · Public Domain",
-        }
-    return None
+def seconds(value):
+    parts = [int(x) for x in re.findall(r"\d+", value or "")]
+    if not parts:
+        return None
+    total = 0
+    for x in parts[-3:]:
+        total = total * 60 + x
+    return total if ":" in (value or "") else parts[-1]
 
 
-# ---------- Global Voices (CC BY 3.0) ----------
-def global_voices(used):
-    for it in rss_items("https://globalvoices.org/feed/"):
-        key = "gv:" + it["link"]
-        if key in used:
-            continue
-        used.add(key)
-        text = clean(it["body"])
-        # 다른 매체 기사를 옮겨 실은 글은 CC BY가 아닐 수 있어서 제외
-        if re.search(r"originally (published|appeared) (in|on|by) (?!Global Voices)|content partnership|republished on Global Voices", text, re.I):
-            continue
-        paragraphs = [clean(p) for p in re.findall(r"<p[^>]*>(.*?)</p>", it["body"], re.S)]
-        paragraphs = [p for p in paragraphs if is_sentence(p)
-                      and not re.search(r"^(screenshot|photo|image)|image via|fair use|\bCC BY", p, re.I)][:12]
-        if len(paragraphs) < 4:
-            continue
-        return {
-            "type": "text", "show": "GLOBAL VOICES", "title": it["title"], "paragraphs": paragraphs, "gloss": {},
-            "source": it["link"], "sourceName": "Global Voices",
-            "credit": f"{it['author'] or 'Global Voices'} — Global Voices, {rss_date(it['date'])} · CC BY 3.0 (excerpt)",
-        }
-    return None
+def small_image(url):
+    """팟캐스트 커버는 3000px 원본이라 작은 크기로 바꿔 쓴다."""
+    url = url.replace("http://", "https://")
+    url = re.sub(r"/images/ic/\d+x\d+/", "/images/ic/480x480/", url)  # BBC
+    url = re.sub(r"/resize/\d+/", "/resize/480/", url)                 # NPR (brightspot)
+    return url
 
 
-# ---------- Simple English Wikipedia 우수 문서 (CC BY-SA 4.0) ----------
-def simple_wikipedia(used):
-    api = "https://simple.wikipedia.org/w/api.php"
-    titles = []
-    for cat in ("Category:Very good articles", "Category:Good articles"):
-        res = get(api, params={"action": "query", "list": "categorymembers", "cmtitle": cat,
-                               "cmlimit": 500, "cmnamespace": 0, "format": "json"}).json()
-        titles += [m["title"] for m in res["query"]["categorymembers"]]
-    random.shuffle(titles)
-    for title in titles:
-        key = "sw:" + title
-        if key in used:
-            continue
-        used.add(key)
-        page = get(api, params={"action": "query", "prop": "extracts", "explaintext": 1,
-                                "titles": title, "format": "json"}).json()
-        text = next(iter(page["query"]["pages"].values())).get("extract", "")
-        paragraphs = []
-        for line in text.split("\n"):
-            # 발음기호가 빠지고 남은 빈 괄호, IPA가 든 괄호 정리
-            line = re.sub(r"\(\s*\)", "", line)
-            line = re.sub(r"\((?:[^();]*(?:\[[^\]]*\]|\b(?:UK|US):)[^();]*;\s*)+", "(", line)
-            line = re.sub(r"\([^()]*(?:\[[^\]]*\]|\b(?:UK|US):)[^()]*\)", "", line)
-            line = re.sub(r"\(\s*[;,]?\s*\)", "", line)
-            line = re.sub(r"\s+([,.;])", r"\1", re.sub(r"\s{2,}", " ", line)).strip()
-            if len(line) > 60 and not line.startswith("="):
-                paragraphs.append(line)
-        paragraphs = paragraphs[:10]
-        if len(paragraphs) < 4:
-            continue
-        return {
-            "type": "text", "show": "SIMPLE WIKIPEDIA", "title": title, "paragraphs": paragraphs, "gloss": {},
-            "source": "https://simple.wikipedia.org/wiki/" + title.replace(" ", "_"),
-            "sourceName": "Simple English Wikipedia",
-            "credit": "Simple English Wikipedia contributors · CC BY-SA 4.0 (excerpt)",
-        }
-    return None
-
-
-# ---------- NASA 영상 ----------
-def nasa(used):
-    year = datetime.now(KST).year
-    items = []
-    for q in NASA_SERIES:
-        try:
-            res = get("https://images-api.nasa.gov/search",
-                      params={"q": q, "media_type": "video", "year_start": str(year - 1)}).json()
-            items += res["collection"]["items"]
-        except Exception:
-            pass
-    items.sort(key=lambda i: i["data"][0].get("date_created", ""), reverse=True)
+# ---------- 뉴스 듣기 ----------
+def podcast(show, source, url, used):
+    channel, items = feed(url)
+    channel_image = attr(channel, "itunes:image", "href")
     for it in items:
-        d = it["data"][0]
-        key = "nasa:" + d["nasa_id"]
-        if key in used:
+        audio = attr(it, "enclosure", "url")
+        key = "pod:" + (tag(it, "guid") or audio)
+        if not audio or key in used:
             continue
         used.add(key)
-        files = [x["href"] for x in get(f"https://images-api.nasa.gov/asset/{d['nasa_id']}").json()["collection"]["items"]]
-        mp4 = next((f for tag in ("~medium.mp4", "~mobile.mp4", "~small.mp4", "~orig.mp4") for f in files if f.endswith(tag)), None)
-        if not mp4:
-            continue
         return {
-            "type": "video", "media": "video", "show": "NASA", "title": d["title"].strip(),
-            "src": mp4.replace("http://", "https://"),
-            "source": f"https://images.nasa.gov/details/{d['nasa_id']}", "sourceName": "NASA Image and Video Library",
-            "credit": f"NASA{(' / ' + d['center']) if d.get('center') else ''} — {d.get('date_created', '')[:10]} · Public Domain",
+            "type": "video", "media": "audio", "show": show, "title": clean(tag(it, "title")),
+            "src": audio.replace("http://", "https://"),
+            "image": small_image(attr(it, "itunes:image", "href") or channel_image),
+            "duration": seconds(tag(it, "itunes:duration")),
+            "date": iso_date(tag(it, "pubDate")),
+            "source": tag(it, "link") or tag(channel, "link"), "sourceName": source,
+            "credit": f"{clean(tag(channel, 'title'))} · {source}",
         }
     return None
 
 
-# ---------- LibriVox ----------
-def librivox(used):
-    for _ in range(8):
-        try:
-            books = get("https://librivox.org/api/feed/audiobooks",
-                        params={"format": "json", "limit": 5, "offset": random.randint(0, 18000), "extended": 1}).json().get("books", [])
-        except Exception:
-            continue
-        for b in books:
-            if b.get("language") != "English":
-                continue
-            for s in b.get("sections", []):
-                url = (s.get("listen_url") or "").replace("http://", "https://")
-                key = "lv:" + url
-                if not url or key in used or not (180 <= int(s.get("playtime") or 0) <= 900):
-                    continue
-                if re.search(r"dramatis personae|table of contents|\bcontents\b|\bindex\b|list of", s.get("title") or "", re.I):
-                    continue
-                used.add(key)
-                authors = ", ".join(f"{a['first_name']} {a['last_name']}".strip() for a in b.get("authors", [])) or "Unknown"
-                return {
-                    "type": "video", "media": "audio", "show": "LIBRIVOX AUDIOBOOK",
-                    "title": f"{clean(b['title'])}: {clean(s.get('title') or 'Section ' + str(s.get('section_number')))}",
-                    "src": url, "source": b.get("url_librivox") or b.get("url_iarchive"),
-                    "sourceName": "LibriVox",
-                    "credit": f"{authors} — LibriVox volunteer recording · Public Domain",
-                }
-    return None
-
-
-# ---------- Wikimedia Commons: Spoken Wikipedia ----------
-def spoken_wikipedia(used):
-    api = "https://commons.wikimedia.org/w/api.php"
-    params = {"action": "query", "format": "json", "generator": "categorymembers",
-              "gcmtitle": "Category:Spoken English Wikipedia", "gcmtype": "file", "gcmlimit": 50,
-              "gcmsort": "timestamp", "gcmdir": "desc",
-              "prop": "videoinfo", "viprop": "url|derivatives|extmetadata|size"}
-    pages = list(get(api, params=params).json().get("query", {}).get("pages", {}).values())
-    random.shuffle(pages)
-    for p in pages:
-        key = "cm:" + p["title"]
-        info = (p.get("videoinfo") or [{}])[0]
-        dur = float(info.get("duration") or 0)
-        if key in used or not (60 <= dur <= 1200):
-            continue
-        mp3 = next((d["src"] for d in info.get("derivatives", []) if d.get("type", "").startswith("audio/mpeg")), None)
-        if not mp3:
+# ---------- 헤드라인 ----------
+def headlines(show, source, url, count, used):
+    _, items = feed(url)
+    out = []
+    for it in items:
+        link = tag(it, "link")
+        key = "news:" + link
+        if not link or key in used:
             continue
         used.add(key)
-        meta = info.get("extmetadata", {})
-        name = re.sub(r"^File:(En[-_ ])?", "", p["title"])
-        name = re.sub(r"(-article)?\.(ogg|oga|flac|wav|mp3)$", "", name, flags=re.I).replace("_", " ")
-        artist = clean(meta.get("Artist", {}).get("value", "")) or "Wikipedia volunteer"
-        lic = clean(meta.get("LicenseShortName", {}).get("value", "")) or "CC BY-SA"
-        return {
-            "type": "video", "media": "audio", "show": "SPOKEN WIKIPEDIA", "title": name,
-            "src": mp3, "source": info.get("descriptionurl"), "sourceName": "Wikimedia Commons",
-            "credit": f"Read by {artist} — Spoken English Wikipedia · {lic}",
-        }
-    return None
-
-
-# ---------- 조립 ----------
-def build(used, rng):
-    programs = []
-    text_shows = list(VOA_TEXT_FEEDS.items())
-    rng.shuffle(text_shows)
-    for show, feed in text_shows:
-        if len(programs) == 2:
+        image = attr(it, "media:thumbnail", "url") or attr(tag(it, "content:encoded"), "img", "src")
+        out.append({
+            "type": "link", "show": show, "title": clean(tag(it, "title")),
+            "summary": clean(tag(it, "description")),
+            "image": image.replace("/standard/240/", "/standard/480/"),
+            "date": iso_date(tag(it, "pubDate")),
+            "source": link, "sourceName": source,
+            "credit": f"{source} · 원문은 {source} 사이트에서 읽을 수 있습니다",
+        })
+        if len(out) == count:
             break
-        try:
-            p = voa_text(show, feed, used)
-            if p:
-                programs.append(p)
-        except Exception as e:
-            print("VOA text failed:", show, e)
+    return out
 
-    for fn in (nasa_science, global_voices, simple_wikipedia):
-        try:
-            p = fn(used)
-            if p:
-                programs.append(p)
-        except Exception as e:
-            print(fn.__name__, "failed:", e)
 
-    listening = []
-    for show, feed in reversed(text_shows):
+def build(used):
+    listening, reading = [], []
+    for show, source, url in PODCASTS:
         try:
-            p = voa_media(show, feed, "audio", used)
-            if p:
-                listening.append(p)
-                break
-        except Exception as e:
-            print("VOA audio failed:", show, e)
-    video_shows = list(VOA_VIDEO_FEEDS.items())
-    rng.shuffle(video_shows)
-    for show, feed in video_shows:
-        try:
-            p = voa_media(show, feed, "video", used)
-            if p:
-                listening.append(p)
-                break
-        except Exception as e:
-            print("VOA video failed:", show, e)
-    for fn in (nasa, librivox, spoken_wikipedia):
-        try:
-            p = fn(used)
+            p = podcast(show, source, url, used)
             if p:
                 listening.append(p)
         except Exception as e:
-            print(fn.__name__, "failed:", e)
-
-    programs += listening
-    n = len(programs)
+            print("podcast failed:", show, e)
+    for show, source, url, count in HEADLINES:
+        try:
+            reading += headlines(show, source, url, count, used)
+        except Exception as e:
+            print("headlines failed:", show, e)
+    programs = listening + reading
     for i, p in enumerate(programs):
         p["id"] = i + 1
-        p["available"] = True
-        p["tune"] = f"{round(8 + 84 * i / max(1, n - 1))}%"
     return programs
 
 
@@ -444,8 +182,8 @@ def main():
             return
     state = load(STATE, {"used": []})
     used = set(state["used"])
-    programs = build(used, random.Random(today))
-    if len(programs) < 7:
+    programs = build(used)
+    if len(programs) < 6:
         sys.exit(f"too few programs ({len(programs)}); keeping previous edition")
 
     index = load(ARCHIVE / "index.json", {"editions": []})
@@ -463,7 +201,7 @@ def main():
     save(STATE, {"used": sorted(used)})
     print(f"new edition {eid}: {len(programs)} programs")
     for p in programs:
-        print(f"  {p['id']}. [{p.get('media', 'text')}] {p['show']} — {p['title']}")
+        print(f"  {p['id']}. [{p.get('media', p['type'])}] {p['show']} — {p['title']}")
 
 
 if __name__ == "__main__":

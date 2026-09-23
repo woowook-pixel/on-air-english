@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>On Air English</title>
-<meta name="description" content="2일마다 새로 바뀌는 영어 읽기·듣기 자료">
+<meta name="description" content="2일마다 새로 바뀌는 BBC·NPR 영어 뉴스">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
@@ -13,6 +13,15 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="On Air">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<!-- 뉴스 팟캐스트는 집계용 리다이렉트를 여러 번 거치므로 미리 연결해 둔다 -->
+<link rel="preconnect" href="https://open.live.bbc.co.uk">
+<link rel="preconnect" href="https://bbc.pdn.tritondigital.com">
+<link rel="preconnect" href="https://prfx.byspotify.com">
+<link rel="preconnect" href="https://play.podtrac.com">
+<link rel="preconnect" href="https://npr.simplecastaudio.com">
+<link rel="preconnect" href="https://ichef.bbci.co.uk">
+<link rel="dns-prefetch" href="https://npr.brightspotcdn.com">
+<link rel="dns-prefetch" href="https://media.npr.org">
 <style>
   :root {
     --accent: #FA2D48;
@@ -64,7 +73,20 @@
   .art {
     flex-shrink: 0; border-radius: 6px; display: flex; align-items: center; justify-content: center;
     background: var(--art-bg); color: var(--art-fg); font-weight: 800; letter-spacing: -0.02em; overflow: hidden;
+    position: relative;
   }
+  .art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .row .art.wide { width: 88px; }
+
+  /* ---------- 헤드라인 화면 ---------- */
+  .hero { width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; margin: 8px 0 16px; font-size: 40px; }
+  .article-meta { font-size: 13px; color: var(--ink-2); margin-bottom: 4px; }
+  .article-title { font-size: 26px; line-height: 1.22; font-weight: 700; letter-spacing: -0.015em; margin: 0 0 14px; }
+  .read-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin: 22px 0 10px;
+    background: var(--accent); color: #fff; font-size: 17px; font-weight: 600; border-radius: 12px; padding: 14px;
+  }
+  .note { font-size: 13px; color: var(--ink-2); text-align: center; }
 
   /* ---------- 듣기 가로 스크롤 ---------- */
   .shelf { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 20px; margin: 0 -20px; padding: 0 20px 4px; scrollbar-width: none; }
@@ -253,6 +275,9 @@ const SOURCES = {
   'Wikimedia Commons':            { short: 'Wikimedia',     mark: 'W',    bg: '#5F5E5A', fg: '#F1EFE8' },
   'LibriVox':                     { short: 'LibriVox',      mark: 'LV',   bg: '#993556', fg: '#FBEAF0' },
   'Internet Archive (LibriVox)':  { short: 'LibriVox',      mark: 'LV',   bg: '#993556', fg: '#FBEAF0' },
+  'BBC':                          { short: 'BBC',           mark: 'BBC',  bg: '#2C2C2A', fg: '#FFFFFF' },
+  'BBC News':                     { short: 'BBC News',      mark: 'BBC',  bg: '#A32D2D', fg: '#FFFFFF' },
+  'NPR':                          { short: 'NPR',           mark: 'NPR',  bg: '#0C447C', fg: '#FFFFFF' },
 };
 const src = p => SOURCES[p.sourceName] || { short: p.sourceName || '', mark: (p.show || '?').slice(0, 2), bg: '#5F5E5A', fg: '#F1EFE8' };
 const isMedia = p => p.type === 'video';
@@ -265,13 +290,26 @@ function paint(el, p) {
   el.style.setProperty('--art-fg', s.fg);
   return el;
 }
-const art = p => paint(h('div', { class: 'art' }, src(p).mark), p);
+function art(p, extraClass) {
+  const a = paint(h('div', { class: 'art' + (extraClass ? ' ' + extraClass : '') }, src(p).mark), p);
+  if (p.image && /^https:\/\//.test(p.image)) {
+    const img = h('img', { src: p.image, alt: '', loading: 'lazy', decoding: 'async' });
+    img.addEventListener('error', () => img.remove());
+    a.append(img);
+  }
+  return a;
+}
 
 function readMinutes(p) {
   const words = (p.paragraphs || []).join(' ').split(/\s+/).length;
   return Math.max(1, Math.round(words / 130));
 }
-const subtitle = p => isMedia(p) ? `${src(p).short} · ${kindLabel(p)}` : `${src(p).short} · ${readMinutes(p)}분 읽기`;
+const minutes = p => p.duration ? `${Math.max(1, Math.round(p.duration / 60))}분` : kindLabel(p);
+function subtitle(p) {
+  if (isMedia(p)) return `${src(p).short} · ${minutes(p)}`;
+  if (p.type === 'link') return `${src(p).short}${p.date ? ' · ' + fmtDate(p.date) : ''}`;
+  return `${src(p).short} · ${readMinutes(p)}분 읽기`;
+}
 
 // ---------- 저장함 (이 기기에만 저장) ----------
 const store = {
@@ -344,16 +382,20 @@ function setTab(tab) {
 
 function row(p, queue) {
   const b = h('button', { class: 'row', 'data-key': keyOf(p) },
-    art(p),
+    art(p, p.type === 'link' && p.image ? 'wide' : ''),
     h('div', { class: 'body' }, h('div', { class: 't' }, p.title), h('div', { class: 's' }, subtitle(p))),
     saveButton(p));
-  b.addEventListener('click', () => isMedia(p) ? play(p, queue) : show(() => renderReader(p), true));
+  b.addEventListener('click', () => {
+    if (isMedia(p)) play(p, queue);
+    else if (p.type === 'link') show(() => renderArticle(p), true);
+    else show(() => renderReader(p), true);
+  });
   return b;
 }
 
 function tile(p, queue) {
   const a = art(p);
-  a.append(h('span', { class: 'kind' }, kindLabel(p)));
+  a.append(h('span', { class: 'kind' }, minutes(p)));
   const b = h('button', { class: 'tile', 'data-key': keyOf(p) },
     a, h('div', { class: 't' }, p.title), h('div', { class: 's' }, src(p).short));
   b.addEventListener('click', () => play(p, queue));
@@ -369,9 +411,9 @@ function renderEdition(ed, past) {
   view.replaceChildren(
     top,
     h('h1', { class: 'large-title' }, past ? `${editionLabel(ed.id)} 목록` : '오늘의 영어'),
-    listening.length ? h('div', { class: 'section-head' }, h('h2', null, '듣기'), h('span', null, `${listening.length}개`)) : null,
+    listening.length ? h('div', { class: 'section-head' }, h('h2', null, '뉴스 듣기'), h('span', null, `${listening.length}개`)) : null,
     listening.length ? h('div', { class: 'shelf' }, listening.map(p => tile(p, listening))) : null,
-    h('div', { class: 'section-head' }, h('h2', null, '읽기'), h('span', null, `${reading.length}개`)),
+    h('div', { class: 'section-head' }, h('h2', null, reading.some(p => p.type === 'link') ? '헤드라인' : '읽기'), h('span', null, `${reading.length}개`)),
     h('div', { class: 'rows' }, reading.map(p => row(p, listening))),
   );
   markPlaying();
@@ -428,6 +470,21 @@ function renderSaved() {
   const listening = list.filter(isMedia);
   view.append(h('div', { class: 'rows' }, list.map(p => row(p, listening))));
   markPlaying();
+}
+
+function renderArticle(p) {
+  const hasLink = p.source && /^https?:\/\//.test(p.source);
+  view.replaceChildren(
+    h('div', { class: 'topbar' },
+      h('button', { class: 'icon-btn', onclick: goBack, 'aria-label': '뒤로' }, icon('back')),
+      saveButton(p)),
+    art(p, 'hero'),
+    h('div', { class: 'article-meta' }, subtitle(p)),
+    h('h1', { class: 'article-title' }, p.title),
+    p.summary ? h('div', { class: 'prose' }, h('p', null, p.summary)) : null,
+    hasLink ? h('a', { class: 'read-btn', href: p.source, target: '_blank', rel: 'noopener' }, `${src(p).short}에서 기사 읽기`, icon('link')) : null,
+    h('p', { class: 'note' }, '기사 본문은 저작권 때문에 원문 사이트에서 읽습니다.'),
+  );
 }
 
 function renderReader(p) {
@@ -492,9 +549,12 @@ function play(p, queue) {
 
 function fillPlayer(p) {
   const s = src(p);
-  [player, $('pArt'), $('miniArt')].forEach(el => paint(el, p));
-  $('pArt').textContent = s.mark;
-  $('miniArt').textContent = s.mark;
+  paint(player, p);
+  for (const id of ['pArt', 'miniArt']) {
+    const fresh = art(p);
+    fresh.id = id;
+    $(id).replaceWith(fresh);
+  }
   $('stage').classList.toggle('is-video', p.media === 'video');
   $('pTitle').textContent = p.title;
   $('pSource').textContent = s.short;
@@ -507,7 +567,10 @@ function fillPlayer(p) {
   if (p.source && /^https?:\/\//.test(p.source)) { link.href = p.source; link.style.visibility = ''; }
   else link.style.visibility = 'hidden';
   if ('mediaSession' in navigator) {
-    navigator.mediaSession.metadata = new MediaMetadata({ title: p.title, artist: s.short, album: 'On Air English' });
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: p.title, artist: s.short, album: 'On Air English',
+      artwork: p.image ? [{ src: p.image, sizes: '480x480' }] : [],
+    });
   }
 }
 
