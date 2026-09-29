@@ -154,7 +154,7 @@
 
   /* ---------- 지금 재생 ---------- */
   #player {
-    position: fixed; inset: 0; z-index: 40; color: #fff; overflow-y: auto;
+    position: fixed; inset: 0; z-index: 40; color: #fff; overflow-y: auto; overscroll-behavior: contain;
     background: #1c1c1e; background: color-mix(in srgb, var(--art-bg, #333) 42%, #000);
     transform: translateY(100%); transition: transform 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0.32s; visibility: hidden;
   }
@@ -591,6 +591,30 @@ function closePlayer(fromPop) {
   player.classList.remove('open');
   if (!fromPop) { state.ignorePop = true; history.back(); }
 }
+
+// 재생 화면을 아래로 쓸어내리면 닫는다 (맨 위까지 스크롤된 상태에서만, 재생 위치 막대는 제외)
+let drag = null;
+player.addEventListener('touchstart', e => {
+  if (e.touches.length !== 1 || player.scrollTop > 0 || e.target.closest('#seek')) return;
+  drag = { y0: e.touches[0].clientY, t0: Date.now(), dy: 0 };
+}, { passive: true });
+player.addEventListener('touchmove', e => {
+  if (!drag) return;
+  drag.dy = Math.max(0, e.touches[0].clientY - drag.y0);
+  player.style.transition = 'none';
+  player.style.transform = `translateY(${drag.dy}px)`;
+}, { passive: true });
+function endDrag(cancelled) {
+  if (!drag) return;
+  const { dy, t0 } = drag;
+  drag = null;
+  player.style.transition = '';
+  player.style.transform = '';
+  const flick = dy > 60 && dy / Math.max(1, Date.now() - t0) > 0.6;  // 짧고 빠르게 튕긴 경우
+  if (!cancelled && (dy > window.innerHeight * 0.18 || flick)) closePlayer(false);
+}
+player.addEventListener('touchend', () => endDrag(false));
+player.addEventListener('touchcancel', () => endDrag(true));
 
 function syncPlayState() {
   const name = media.paused ? 'play' : 'pause';
