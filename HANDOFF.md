@@ -6,8 +6,8 @@
 
 영어 뉴스로 듣기·읽기를 공부하는 웹앱(PWA). 사용자는 아이폰 홈 화면에 설치해서 쓴다.
 
-- 사이트: https://woowook-pixel.github.io/on-air-english/
-- 배포: GitHub Pages (Source = GitHub Actions)
+- 사이트: https://on-air-english.woowook.workers.dev/ (Cloudflare Workers 정적 파일, `main` 푸시 시 자동 배포, 설정은 `wrangler.jsonc`·`.assetsignore`)
+- 옛 주소 https://woowook-pixel.github.io/on-air-english/ 는 GitHub Pages로 아직 같이 배포됨. iOS가 같은 도메인의 웹앱을 헷갈리는 문제를 피하려고 별도 도메인으로 옮기는 중이며, 새 주소 확인이 끝나면 정리 예정
 - 서버·빌드 도구 없음. `index.html` 하나(HTML+CSS+JS)와 JSON 데이터.
 
 ### 구조
