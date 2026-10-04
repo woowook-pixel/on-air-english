@@ -1,0 +1,6 @@
+.github
+.git
+scripts
+HANDOFF.md
+wrangler.jsonc
+.assetsignore
