@@ -622,6 +622,9 @@ function syncPlayState() {
   setIcon($('miniPlay'), name);
   $('pPlay').setAttribute('aria-label', media.paused ? '재생' : '일시정지');
   $('miniPlay').setAttribute('aria-label', media.paused ? '재생' : '일시정지');
+  if ('mediaSession' in navigator && state.current) {
+    navigator.mediaSession.playbackState = media.paused ? 'paused' : 'playing';
+  }
 }
 
 let seeking = false;
@@ -633,7 +636,11 @@ media.addEventListener('timeupdate', () => {
 });
 media.addEventListener('play', syncPlayState);
 media.addEventListener('pause', syncPlayState);
-media.addEventListener('ended', playNext);
+media.addEventListener('ended', () => {
+  const i = state.queue.findIndex(x => keyOf(x) === keyOf(state.current));
+  if (state.queue[i + 1]) playNext();
+  else if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none'; // 다음 곡이 없으면 Now Playing 정리
+});
 $('seek').addEventListener('input', () => {
   seeking = true;
   $('tNow').textContent = fmtTime($('seek').value / 1000 * (media.duration || 0));
@@ -663,7 +670,16 @@ if ('mediaSession' in navigator) {
   navigator.mediaSession.setActionHandler('seekbackward', () => { media.currentTime = Math.max(0, media.currentTime - 15); });
   navigator.mediaSession.setActionHandler('seekforward', () => { media.currentTime += 15; });
   navigator.mediaSession.setActionHandler('nexttrack', playNext);
+  navigator.mediaSession.setActionHandler('seekto', e => { if (e.seekTime != null) media.currentTime = e.seekTime; });
 }
+
+// 앱이 완전히 닫힐 때(pagehide)만 재생 상태를 정리한다. 화면이 숨겨질 때(visibilitychange)는 백그라운드 재생을 위해 멈추지 않는다.
+window.addEventListener('pagehide', e => {
+  if (e.persisted || !('mediaSession' in navigator)) return;
+  media.pause();
+  navigator.mediaSession.playbackState = 'none';
+  navigator.mediaSession.metadata = null;
+});
 
 // ---------- 시작 ----------
 setIcon($('pClose'), 'down');
