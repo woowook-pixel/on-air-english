@@ -4,12 +4,15 @@
 <title>On Air English 시안</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#d9dce1;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#222;padding:24px 16px 60px}
+:root{--bg:#d9dce1;--fg:#222;--muted:#555}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#1c1d20;--fg:#eee;--muted:#aaa}}
+:root[data-theme="dark"]{--bg:#1c1d20;--fg:#eee;--muted:#aaa}
+body{background:var(--bg);font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:var(--fg);padding:24px 16px 60px}
 h1{font-size:20px;text-align:center;margin-bottom:4px}
-.sub{text-align:center;color:#555;font-size:13px;margin-bottom:28px}
+.sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:28px}
 .concept{max-width:760px;margin:0 auto 44px}
 .concept h2{font-size:17px;margin-bottom:2px}
-.concept p{font-size:13px;color:#444;margin-bottom:14px;line-height:1.5}
+.concept p{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5}
 .row{display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
 .phone{width:300px;height:620px;border-radius:38px;background:#111;padding:10px;box-shadow:0 10px 30px rgba(0,0,0,.35);flex:none}
 .scr{width:100%;height:100%;border-radius:29px;overflow:hidden;position:relative;background:#fff}
@@ -73,7 +76,7 @@ h1{font-size:20px;text-align:center;margin-bottom:4px}
 .cf .tr:nth-child(odd){background:#f1f1f1}.cf .tr.pl{background:linear-gradient(#5a96e6,#2f6fd0);color:#fff}.cf .tr{border-color:#e6e6e6}
 .cf .tab{display:flex;background:linear-gradient(#444,#151515);border-top:1px solid #666;height:50px}
 .cf .tab span{flex:1;text-align:center;font-size:10px;color:#aaa;padding-top:8px}.cf .tab .on{color:#6db4ff}
-.note{font-size:12px;color:#555;max-width:760px;margin:0 auto}
+.note{font-size:12px;color:var(--muted);max-width:760px;margin:0 auto}
 </style></head><body>
 <h1>On Air English 디자인 시안</h1>
 <p class="sub">같은 내용(BBC·NPR 뉴스)을 세 가지 옛 애플 스타일로 그렸어요. 화면은 실제 앱이 아니라 그림이에요.</p>
