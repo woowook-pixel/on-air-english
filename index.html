@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>On Air English</title>
 <meta name="description" content="매일 새로 바뀌는 BBC·NPR 영어 뉴스">
-<meta name="theme-color" content="#c9ccd1">
+<meta name="theme-color" content="#2b2c30">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="On Air">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <!-- 뉴스 팟캐스트는 집계용 리다이렉트를 여러 번 거치므로 미리 연결해 둔다 -->
 <link rel="preconnect" href="https://open.live.bbc.co.uk">
 <link rel="preconnect" href="https://bbc.pdn.tritondigital.com">
@@ -24,29 +24,34 @@
 <style>
   :root { --sel1: #4fa6f0; --sel2: #1a62c4; --safe-b: env(safe-area-inset-bottom, 0px); }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
-  html, body { margin: 0; height: 100%; overflow: hidden; background: #d9dce1; }
-  @media (prefers-color-scheme: dark) { html, body { background: #1c1d20; } }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #2b2c30; }
   body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Apple SD Gothic Neo", "Segoe UI", "Noto Sans KR", sans-serif; color: #000; -webkit-font-smoothing: antialiased; }
   button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
   a { color: inherit; text-decoration: none; }
   svg.i { width: 1em; height: 1em; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; vertical-align: middle; }
 
   /* ---------- 아이팟 본체 ---------- */
+  body { display: flex; align-items: center; justify-content: center; padding: calc(env(safe-area-inset-top, 0px) + 14px) 14px calc(env(safe-area-inset-bottom, 0px) + 14px); }
   #ipod {
-    height: 100vh; height: 100dvh; max-width: 430px; margin: 0 auto; display: flex; flex-direction: column; align-items: center;
-    padding: calc(env(safe-area-inset-top, 0px) + 14px) 16px 0;
-    background: linear-gradient(160deg, #f4f4f5, #c3c6cb 55%, #aaadb3);
+    width: 100%; max-width: 340px; height: 100%; max-height: 680px; display: flex; flex-direction: column; align-items: center;
+    padding: 18px 14px 0; border-radius: 34px; position: relative;
+    background: linear-gradient(160deg, #f6f6f7, #c6c9ce 55%, #adb0b6);
+    border: 1px solid #5d6066;
+    box-shadow: inset 0 0 0 2px #fbfbfc, inset 0 0 0 3px #9a9da4, inset 0 14px 18px -10px rgba(255,255,255,.9), inset 0 -16px 22px -12px rgba(0,0,0,.28), 0 2px 0 #7b7e85, 0 18px 40px rgba(0,0,0,.6), 0 4px 10px rgba(0,0,0,.4);
   }
-  @media (min-width: 500px) { #ipod { height: min(100dvh, 860px); margin-top: calc(50vh - min(50dvh, 430px)); border-radius: 36px; box-shadow: 0 12px 40px rgba(0,0,0,.35); } }
 
   /* ---------- 화면(LCD) ---------- */
   #lcd {
     position: relative; width: 100%; flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
-    background: #fff; border: 3px solid #6c6f75; border-radius: 10px; box-shadow: inset 0 0 8px rgba(0,0,0,.35);
+    background: #fff; border: 3px solid #55585e; border-radius: 10px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.95), 0 -1px 2px rgba(0,0,0,.25);
   }
+  /* 유리 반사 */
+  #lcd::after { content: ''; position: absolute; inset: 0; z-index: 5; pointer-events: none; border-radius: 7px;
+    background: linear-gradient(158deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,.10) 38%, rgba(255,255,255,0) 39%), linear-gradient(0deg, rgba(0,0,0,.07), rgba(0,0,0,0) 22%); }
   .tb {
-    flex: none; height: 30px; display: flex; align-items: center; justify-content: space-between; padding: 0 10px;
-    background: linear-gradient(#fafafa, #c9ccd1); border-bottom: 1px solid #8b8e93; font-size: 15px; font-weight: 700;
+    flex: none; height: 26px; display: flex; align-items: center; justify-content: space-between; padding: 0 8px;
+    background: linear-gradient(#ffffff, #dfe1e5 48%, #c3c6cb 52%, #d5d7db); border-bottom: 1px solid #7e8187; box-shadow: 0 1px 2px rgba(0,0,0,.25); font-size: 13px; font-weight: 700; position: relative; z-index: 1;
   }
   .tb #tbState { width: 22px; font-size: 13px; display: inline-flex; }
   .tb #title { flex: 1; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -55,12 +60,22 @@
   #scr { flex: 1; min-height: 0; display: flex; flex-direction: column; }
   .list { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
 
-  .li { width: 100%; min-height: 40px; display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-bottom: 1px solid #e6e6e6; font-size: 17px; }
+  .li { width: 100%; min-height: 36px; display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-bottom: 1px solid #e6e6e6; font-size: 15px; }
+  .li .ri { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 7px; font-size: 15px; color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.55), 0 1px 2px rgba(0,0,0,.4); text-shadow: 0 -1px 0 rgba(0,0,0,.25); }
+  .ri.audio { background: linear-gradient(#ff9a6b, #e4401c); }
+  .ri.article { background: linear-gradient(#78b9f7, #2569c9); }
+  .ri.misc { background: linear-gradient(#b4b7bd, #7a7d85); }
+  .tag { flex: none; font-size: 10px; font-weight: 700; letter-spacing: 0; padding: 2px 6px; border-radius: 9px; color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.45); }
+  .tag.audio { background: linear-gradient(#ff9a6b, #e4401c); }
+  .tag.article { background: linear-gradient(#78b9f7, #2569c9); }
+  .li.sel .tag { box-shadow: 0 0 0 1px rgba(255,255,255,.85), inset 0 1px 0 rgba(255,255,255,.45); }
   .li .grow { flex: 1; min-width: 0; }
   .li .lab { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .li .sub { display: block; font-size: 12px; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
-  .li .rt { flex: none; font-size: 14px; color: #777; }
-  .li.sel { background: linear-gradient(var(--sel1), var(--sel2)); color: #fff; border-color: var(--sel2); }
+  .li .sub { display: block; font-size: 11px; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+  .li .rt { flex: none; font-size: 13px; color: #777; }
+  .li { transition: background .08s; }
+  .li:active { background: #e9eef6; }
+  .li.sel { background: linear-gradient(#78bcf8, #3d8fe6 48%, #1f66c9 52%, #2a74d8); color: #fff; border-color: #1a5ab8; text-shadow: 0 -1px 0 rgba(0,0,0,.35); box-shadow: inset 0 1px 0 rgba(255,255,255,.55); }
   .li.sel .sub, .li.sel .rt { color: rgba(255,255,255,.8); }
   .li.playing .lab::before { content: "♪ "; }
   .li.sel .lab.mq span { display: inline-block; animation: mq 7s linear infinite alternate; }
@@ -70,14 +85,14 @@
   .empty b { display: block; color: #000; font-size: 18px; margin-bottom: 4px; }
 
   /* ---------- 상세·지금 재생 ---------- */
-  .dtbody { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 10px 12px; font-size: 16px; line-height: 1.45; }
+  .dtbody { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 8px 10px; font-size: 14px; line-height: 1.45; }
   .head { display: flex; gap: 10px; align-items: flex-start; }
-  .head .art { width: 72px; height: 72px; font-size: 20px; border-radius: 6px; }
-  .head h3 { margin: 0 0 3px; font-size: 16px; line-height: 1.25; }
+  .head .art { width: 60px; height: 60px; font-size: 17px; border-radius: 6px; }
+  .head h3 { margin: 0 0 3px; font-size: 14px; line-height: 1.25; }
   .head small { color: #666; font-size: 12px; }
   .dtbody p { margin: 10px 0 0; }
   .acts { flex: none; border-top: 1px solid #c8c8c8; }
-  .np { flex: 1; min-height: 0; overflow-y: auto; padding: 10px 12px; }
+  .np { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 10px; }
   body.np-video .np { padding-top: 190px; }
   .bar { margin-top: 18px; height: 14px; border: 1px solid #777; border-radius: 7px; background: linear-gradient(#ddd, #fff); position: relative; overflow: hidden; }
   .bar i { position: absolute; inset: 0 100% 0 0; background: linear-gradient(#5fb0ff, #1a62c4); }
@@ -86,7 +101,7 @@
   .art { flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--art-bg); color: var(--art-fg); font-weight: 800; letter-spacing: -0.02em; overflow: hidden; position: relative; }
   .art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
-  #vbox { position: absolute; left: 0; right: 0; top: 30px; height: 1px; opacity: 0; pointer-events: none; overflow: hidden; background: #000; z-index: 2; }
+  #vbox { position: absolute; left: 0; right: 0; top: 26px; height: 1px; opacity: 0; pointer-events: none; overflow: hidden; background: #000; z-index: 2; }
   #vbox video { width: 100%; height: 100%; object-fit: contain; }
   body.np-video #vbox { height: 180px; opacity: 1; pointer-events: auto; }
   #toast { position: absolute; left: 12px; right: 12px; bottom: 12px; padding: 8px 12px; border-radius: 8px; background: rgba(0,0,0,.78); color: #fff; font-size: 14px; text-align: center; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 3; }
@@ -94,19 +109,29 @@
 
   /* ---------- 클릭휠 ---------- */
   #wheel {
-    --w: clamp(180px, min(78vw, 270px, 33dvh), 270px);
-    flex: none; position: relative; width: var(--w); height: var(--w); margin: 20px 0 calc(var(--safe-b) + 22px); border-radius: 50%; touch-action: none; user-select: none; -webkit-user-select: none;
-    background: radial-gradient(circle at 50% 30%, #fdfdfd, #d4d6da); box-shadow: 0 2px 6px rgba(0,0,0,.35), inset 0 -3px 6px rgba(0,0,0,.12);
+    --w: clamp(150px, min(62vw, 220px, 30dvh), 220px);
+    flex: none; position: relative; width: var(--w); height: var(--w); margin: 16px 0 20px; border-radius: 50%; touch-action: none; user-select: none; -webkit-user-select: none;
+    background: radial-gradient(circle at 50% 22%, #ffffff, #e3e5e8 45%, #c9ccd1);
+    box-shadow: 0 1px 0 #fff, 0 7px 12px rgba(0,0,0,.4), 0 1px 3px rgba(0,0,0,.5), inset 0 2px 3px #fff, inset 0 -7px 12px rgba(0,0,0,.2), inset 0 0 0 1px rgba(0,0,0,.18);
+    transition: box-shadow .1s;
   }
-  .wb { position: absolute; display: flex; align-items: center; justify-content: center; color: #6a6d73; font-size: 12px; font-weight: 700; letter-spacing: .02em; width: 56px; height: 40px; text-align: center; }
-  .wb svg.i { font-size: 22px; fill: currentColor; stroke: currentColor; }
+  #wheel.touch { box-shadow: 0 1px 0 #fff, 0 4px 8px rgba(0,0,0,.4), 0 1px 3px rgba(0,0,0,.5), inset 0 3px 6px rgba(0,0,0,.18), inset 0 -4px 8px rgba(0,0,0,.12), inset 0 0 0 1px rgba(0,0,0,.2); }
+  /* 손가락을 따라 도는 빛 */
+  #wsheen { position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+    background: conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,.85) 14deg, rgba(255,255,255,0) 34deg, rgba(0,0,0,0) 180deg, rgba(0,0,0,.10) 205deg, rgba(0,0,0,0) 225deg);
+    -webkit-mask: radial-gradient(circle, transparent 0 36%, #000 37%); mask: radial-gradient(circle, transparent 0 36%, #000 37%); }
+  .wb { position: absolute; z-index: 1; display: flex; align-items: center; justify-content: center; color: #6a6d73; font-size: 12px; font-weight: 700; letter-spacing: .02em; width: 56px; height: 40px; text-align: center; text-shadow: 0 1px 0 rgba(255,255,255,.9); border-radius: 12px; transition: transform .06s, background .06s; }
+  .wb svg.i { font-size: 22px; fill: currentColor; stroke: currentColor; filter: drop-shadow(0 1px 0 rgba(255,255,255,.9)); }
+  .wb:active, .wb.press { transform: translateY(1px) scale(.94); color: #2a2c30; background: radial-gradient(closest-side, rgba(0,0,0,.16), rgba(0,0,0,0)); }
   #wMenu { top: 8%; left: calc(50% - 28px); }
   #wPrev { left: 5%; top: calc(50% - 20px); }
   #wNext { right: 5%; top: calc(50% - 20px); }
   #wPlay { bottom: 8%; left: calc(50% - 28px); }
-  #wCenter { position: absolute; left: 50%; top: 50%; width: 36%; height: 36%; margin: -18% 0 0 -18%; border-radius: 50%; background: radial-gradient(circle at 50% 30%, #fff, #d0d2d6); box-shadow: inset 0 0 6px rgba(0,0,0,.25), 0 0 0 1px #aaa; }
-  #wCenter:active { background: radial-gradient(circle at 50% 30%, #eee, #c4c6ca); }
-  .wb:active { color: #222; }
+  #wCenter { position: absolute; z-index: 1; left: 50%; top: 50%; width: 36%; height: 36%; margin: -18% 0 0 -18%; border-radius: 50%;
+    background: radial-gradient(circle at 50% 24%, #ffffff, #e6e8eb 50%, #cfd2d6);
+    box-shadow: 0 1px 0 #fff, 0 3px 6px rgba(0,0,0,.45), 0 0 0 1px #9a9da4, inset 0 2px 2px #fff, inset 0 -4px 6px rgba(0,0,0,.15); transition: transform .06s, box-shadow .06s; }
+  #wCenter:active, #wCenter.press { transform: scale(.95); background: radial-gradient(circle at 50% 30%, #eceef0, #c2c5ca);
+    box-shadow: 0 0 0 1px #8c8f96, inset 0 3px 7px rgba(0,0,0,.35), inset 0 -1px 2px rgba(255,255,255,.7); }
 </style>
 </head>
 <body>
@@ -118,6 +143,7 @@
     <div id="toast"></div>
   </div>
   <div id="wheel">
+    <div id="wsheen"></div>
     <button class="wb" id="wMenu" aria-label="메뉴(뒤로)">MENU</button>
     <button class="wb" id="wPrev" aria-label="15초 뒤로"></button>
     <button class="wb" id="wNext" aria-label="15초 앞으로 (길게 누르면 다음 방송)"></button>
@@ -133,6 +159,11 @@ const ICONS = {
   pause: '<rect x="5.5" y="4" width="4.5" height="16" rx="1.2" fill="currentColor" stroke="none"/><rect x="14" y="4" width="4.5" height="16" rx="1.2" fill="currentColor" stroke="none"/>',
   prev: '<path d="M19 5v14L8 12z" fill="currentColor" stroke="none"/><rect x="4" y="5" width="3" height="14" rx="1" fill="currentColor" stroke="none"/>',
   next: '<path d="M5 5v14l11-7z" fill="currentColor" stroke="none"/><rect x="17" y="5" width="3" height="14" rx="1" fill="currentColor" stroke="none"/>',
+  headphones: '<path d="M4 15v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="14" width="4" height="7" rx="1.5"/><rect x="17" y="14" width="4" height="7" rx="1.5"/>',
+  doc: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  bookmark: '<path d="M18 7v14l-6-4-6 4V7a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4z"/>',
+  gear: '<circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>',
   playpause: '<path d="M3 5v14l8-7z" fill="currentColor" stroke="none"/><rect x="14" y="5" width="3" height="14" rx="1" fill="currentColor" stroke="none"/><rect x="19" y="5" width="3" height="14" rx="1" fill="currentColor" stroke="none"/>',
 };
 function icon(name) {
@@ -276,9 +307,11 @@ function setRows(s, items, rowsEl, scrollEl) {
 }
 function makeRow(s, it, i) {
   const li = h('button', { class: 'li', 'data-key': it.key || '' },
+    it.icon ? h('span', { class: 'ri ' + (it.icon === 'headphones' ? 'audio' : it.icon === 'doc' ? 'article' : 'misc') }, icon(it.icon)) : null,
     h('span', { class: 'grow' },
       h('span', { class: 'lab' }, h('span', null, it.label)),
       it.sub ? h('span', { class: 'sub' }, it.sub) : null),
+    it.tag ? h('span', { class: 'tag ' + it.tag[0] }, it.tag[1]) : null,
     it.right ? h('span', { class: 'rt' }, it.right) : null);
   li.addEventListener('click', () => { s.sel = i; applySel(); it.onSelect(); });
   return li;
@@ -335,18 +368,30 @@ function markPlaying() {
 // ---------- 화면들 ----------
 function renderMenu() {
   drawList('On Air', [
-    { label: '오늘', right: '›', onSelect: () => withLatest(ed => show(() => renderListen(ed, '오늘'), true)) },
-    { label: '헤드라인', right: '›', onSelect: () => withLatest(ed => show(() => renderSources(ed), true)) },
-    { label: '지난 목록', right: '›', onSelect: () => show(renderArchive, true) },
-    { label: '저장함', right: '›', onSelect: () => show(renderSaved, true) },
-    { label: '지금 재생 중', right: '›', onSelect: () => state.current ? show(renderNowPlaying, true) : flash('재생 중인 방송이 없어요') },
+    { icon: 'headphones', label: '뉴스 듣기', sub: '음성 · 오늘의 방송 5개', right: '›', onSelect: () => withLatest(ed => show(() => renderListen(ed, '뉴스 듣기'), true)) },
+    { icon: 'doc', label: '기사 읽기', sub: '글 · 오늘의 헤드라인', right: '›', onSelect: () => withLatest(ed => show(() => renderSources(ed), true)) },
+    { icon: 'clock', label: '지난 목록', right: '›', onSelect: () => show(renderArchive, true) },
+    { icon: 'bookmark', label: '저장함', right: '›', onSelect: () => show(renderSaved, true) },
+    { icon: 'play', label: '지금 재생 중', right: '›', onSelect: () => state.current ? show(renderNowPlaying, true) : flash('재생 중인 방송이 없어요') },
+    { icon: 'gear', label: '설정', right: '›', onSelect: () => show(renderSettings, true) },
   ]);
+}
+
+function renderSettings() {
+  const s = cur();
+  const label = () => '클릭 소리: ' + (sound.on ? '켜짐' : '꺼짐');
+  drawList('설정', [{ icon: 'gear', label: label(), onSelect: () => {
+    sound.on = !sound.on;
+    try { localStorage.setItem('onair.click', sound.on ? '1' : '0'); } catch {}
+    s.rowsEl.children[0].querySelector('.lab span').textContent = label();
+    clickSound();
+  } }]);
 }
 
 function renderListen(ed, title) {
   const listening = ed.programs.filter(isMedia);
   drawList(title, listening.map(p => ({
-    label: p.title, sub: prettyShow(p.show) + ' · ' + minutes(p), key: keyOf(p),
+    icon: 'headphones', tag: ['audio', '음성'], label: p.title, sub: prettyShow(p.show) + ' · ' + minutes(p), key: keyOf(p),
     onSelect: () => playAndOpen(p, listening),
   })), '듣기 목록이 없어요');
 }
@@ -355,15 +400,15 @@ function renderSources(ed) {
   const reading = ed.programs.filter(p => !isMedia(p));
   const groups = new Map();
   reading.forEach(p => { const k = p.show || src(p).short; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(p); });
-  drawList('헤드라인', [...groups].map(([k, list]) => ({
-    label: prettyShow(k), right: `${list.length} ›`,
+  drawList('기사 읽기', [...groups].map(([k, list]) => ({
+    icon: 'doc', label: prettyShow(k), right: `${list.length} ›`,
     onSelect: () => show(() => renderHeadlines(k, list), true),
   })), '읽을거리가 없어요');
 }
 
 function renderHeadlines(name, list) {
   drawList(prettyShow(name), list.map(p => ({
-    label: p.title, sub: p.date ? fmtDate(p.date) : subtitle(p), key: keyOf(p),
+    icon: 'doc', tag: ['article', '기사'], label: p.title, sub: p.date ? fmtDate(p.date) : subtitle(p), key: keyOf(p),
     onSelect: () => show(() => renderDetail(p), true),
   })));
 }
@@ -390,8 +435,8 @@ function renderEdition(ed) {
   const listening = ed.programs.filter(isMedia);
   const reading = ed.programs.filter(p => !isMedia(p));
   drawList(editionLabel(ed.id), [
-    listening.length ? { label: '듣기', right: `${listening.length} ›`, onSelect: () => show(() => renderListen(ed, '듣기'), true) } : null,
-    reading.length ? { label: '헤드라인', right: `${reading.length} ›`, onSelect: () => show(() => renderSources(ed), true) } : null,
+    listening.length ? { icon: 'headphones', label: '뉴스 듣기', right: `${listening.length} ›`, onSelect: () => show(() => renderListen(ed, '뉴스 듣기'), true) } : null,
+    reading.length ? { icon: 'doc', label: '기사 읽기', right: `${reading.length} ›`, onSelect: () => show(() => renderSources(ed), true) } : null,
   ].filter(Boolean), '비어 있어요');
 }
 
@@ -399,7 +444,7 @@ function renderSaved() {
   const list = store.get();
   const listening = list.filter(isMedia);
   drawList('저장함', list.map(p => ({
-    label: p.title, sub: subtitle(p), key: keyOf(p),
+    icon: isMedia(p) ? 'headphones' : 'doc', tag: isMedia(p) ? ['audio', '음성'] : ['article', '기사'], label: p.title, sub: subtitle(p), key: keyOf(p),
     onSelect: () => isMedia(p) ? playAndOpen(p, listening) : show(() => renderDetail(p), true),
   })), '저장한 자료가 없어요', '기사나 방송 화면에서 "저장"을 누르면 여기에 모입니다. 저장한 자료는 이 기기에만 남아요.');
 }
@@ -425,7 +470,7 @@ function renderDetail(p) {
   document.body.classList.remove('np-video');
   const paras = p.summary ? [p.summary] : (p.paragraphs || []).map(t => t.replace(/[{}]/g, ''));
   const body = h('div', { class: 'dtbody' },
-    h('div', { class: 'head' }, art(p), h('div', null, h('h3', null, p.title), h('small', null, subtitle(p)))),
+    h('div', { class: 'head' }, art(p), h('div', null, h('h3', null, p.title), h('small', null, h('span', { class: 'tag article' }, '기사'), ' ' + subtitle(p)))),
     paras.map(t => h('p', null, t)),
     h('p', { style: 'color:#777;font-size:12px' }, '기사 본문은 저작권 때문에 원문 사이트에서 읽습니다.'));
   const acts = h('div', { class: 'acts' });
@@ -448,11 +493,11 @@ function renderDetail(p) {
 function renderNowPlaying() {
   const s = cur();
   const p = state.current;
-  $('title').textContent = '지금 재생 중';
+  $('title').textContent = '음성 뉴스';
   document.body.classList.toggle('np-video', !!p && p.media === 'video');
   if (!p) { scr.replaceChildren(h('div', { class: 'empty' }, h('b', null, '재생 중인 방송이 없어요'))); setRows(s, [], scr); return; }
   const np = h('div', { class: 'np' },
-    h('div', { class: 'head' }, art(p), h('div', null, h('h3', null, p.title), h('small', null, prettyShow(p.show) + ' · ' + src(p).short))),
+    h('div', { class: 'head' }, art(p), h('div', null, h('h3', null, p.title), h('small', null, h('span', { class: 'tag audio' }, '음성'), ' ' + prettyShow(p.show) + ' · ' + src(p).short))),
     h('div', { class: 'bar', id: 'npBar' }, h('i', { id: 'npFill' })),
     h('div', { class: 'tm' }, h('span', { id: 'tNow' }, '0:00'), h('span', { id: 'tLeft' }, '-0:00')),
     h('div', { class: 'hint' }, '휠을 돌리면 5초씩, 휠의 ◀◀ ▶▶ 버튼은 15초씩 이동해요.\n▶▶ 를 길게 누르면 다음 방송으로 가요.'));
@@ -564,6 +609,25 @@ window.addEventListener('pagehide', e => {
   navigator.mediaSession.metadata = null;
 });
 
+// ---------- 클릭 소리·진동 (설정에서 켜고 끔, 기본은 꺼짐) ----------
+const sound = { on: (() => { try { return localStorage.getItem('onair.click') === '1'; } catch { return false; } })(), ctx: null };
+function beep(freq, dur, vol) {
+  if (!sound.on) return;
+  try {
+    const c = sound.ctx || (sound.ctx = new (window.AudioContext || window.webkitAudioContext)());
+    if (c.state === 'suspended') c.resume();
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = 'square'; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, c.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + dur);
+    o.connect(g); g.connect(c.destination);
+    o.start(); o.stop(c.currentTime + dur);
+  } catch {}
+}
+const vibe = ms => { try { if (sound.on && navigator.vibrate) navigator.vibrate(ms); } catch {} };
+const tickSound = () => { beep(2300, 0.012, 0.03); vibe(5); };
+const clickSound = () => { beep(1100, 0.03, 0.05); vibe(10); };
+
 // ---------- 클릭휠 ----------
 const wheel = $('wheel');
 setIcon($('wPrev'), 'prev');
@@ -572,6 +636,7 @@ setIcon($('wPlay'), 'playpause');
 function setIcon(el, name) { el.replaceChildren(icon(name)); }
 
 function wheelStep(dir) {
+  tickSound();
   const s = cur();
   if (s && s.onStep) s.onStep(dir); else moveSel(dir);
 }
@@ -582,23 +647,27 @@ const angleOf = e => {
   return Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)) * 180 / Math.PI;
 };
 // 버튼 위에서 시작해도 돌리면 휠로 동작하고, 거의 안 움직이면 버튼 누름으로 처리한다
-let wTotal = 0, wMoved = false;
+let wTotal = 0, wMoved = false, wRot = 0;
 wheel.addEventListener('pointerdown', e => {
   if (e.target.closest('#wCenter')) return;
   wAng = angleOf(e); wAcc = 0; wTotal = 0; wMoved = false;
+  wheel.classList.add('touch');
 });
 wheel.addEventListener('pointermove', e => {
   if (wAng == null) return;
   const a = angleOf(e);
   let d = a - wAng;
   if (d > 180) d -= 360; if (d < -180) d += 360;
-  wAng = a; wAcc += d; wTotal += d;
+  wAng = a; wAcc += d; wTotal += d; wRot += d;
+  $('wsheen').style.transform = `rotate(${wRot}deg)`;
   if (!wMoved && Math.abs(wTotal) > 8) { wMoved = true; clearTimeout(nextTimer); try { wheel.setPointerCapture(e.pointerId); } catch {} }
   const STEP = 26;
   while (wAcc >= STEP) { wAcc -= STEP; wheelStep(1); }
   while (wAcc <= -STEP) { wAcc += STEP; wheelStep(-1); }
 });
-['pointerup', 'pointercancel'].forEach(t => wheel.addEventListener(t, () => { wAng = null; }));
+['pointerup', 'pointercancel'].forEach(t => wheel.addEventListener(t, () => { wAng = null; wheel.classList.remove('touch'); }));
+// 버튼 누름 소리
+['wMenu', 'wPrev', 'wNext', 'wPlay', 'wCenter'].forEach(id => $(id).addEventListener('pointerdown', clickSound));
 wheel.addEventListener('click', e => { if (wMoved) { e.stopPropagation(); e.preventDefault(); wMoved = false; } }, true);
 
 $('wMenu').addEventListener('click', goBack);
