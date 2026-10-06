@@ -4,6 +4,8 @@
 
 ## 이 프로젝트
 
+앱 이름은 **On Air Classic**(홈 화면에는 짧게 "On Air"). 아이콘은 은색 클릭휠 + 빨간 "방송 중" 램프(`icons/icon.svg`가 원본, PNG는 여기서 만든다).
+
 영어 뉴스로 듣기·읽기를 공부하는 웹앱(PWA). 사용자는 아이폰 홈 화면에 설치해서 쓴다.
 
 - 사이트: https://woowook-pixel.github.io/on-air-english/
