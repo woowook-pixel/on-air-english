@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>On Air English 시안</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#d9dce1;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;color:#222;padding:24px 16px 60px}
+h1{font-size:20px;text-align:center;margin-bottom:4px}
+.sub{text-align:center;color:#555;font-size:13px;margin-bottom:28px}
+.concept{max-width:760px;margin:0 auto 44px}
+.concept h2{font-size:17px;margin-bottom:2px}
+.concept p{font-size:13px;color:#444;margin-bottom:14px;line-height:1.5}
+.row{display:flex;gap:18px;flex-wrap:wrap;justify-content:center}
+.phone{width:300px;height:620px;border-radius:38px;background:#111;padding:10px;box-shadow:0 10px 30px rgba(0,0,0,.35);flex:none}
+.scr{width:100%;height:100%;border-radius:29px;overflow:hidden;position:relative;background:#fff}
+.art{border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.a1{background:linear-gradient(135deg,#d6202f,#7a0a15)}
+.a2{background:linear-gradient(135deg,#2a2a2a,#000);}
+.a3{background:linear-gradient(135deg,#f08a24,#b34b00)}
+.a4{background:linear-gradient(135deg,#2b8fd6,#124c86)}
+.a5{background:linear-gradient(135deg,#3aa16a,#16603a)}
+
+/* ===== A. iPod Classic ===== */
+.ipod{background:linear-gradient(160deg,#f2f2f2,#bfc2c7 60%,#a9acb2);padding:22px 16px 0;display:flex;flex-direction:column;align-items:center;height:100%}
+.lcd{width:100%;height:268px;background:#fff;border:3px solid #6c6f75;border-radius:8px;overflow:hidden;font-family:"Myriad Pro","Helvetica Neue",Arial,sans-serif;box-shadow:inset 0 0 8px rgba(0,0,0,.35)}
+.tb{height:26px;background:linear-gradient(#f9f9f9,#c9ccd1);border-bottom:1px solid #8b8e93;display:flex;align-items:center;justify-content:space-between;padding:0 8px;font-size:13px;font-weight:700}
+.bat{width:22px;height:10px;border:1px solid #333;border-radius:2px;position:relative}.bat i{position:absolute;inset:1px 5px 1px 1px;background:#3b3}
+.li{height:27px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:14px;border-bottom:1px solid #e6e6e6}
+.li.sel{background:linear-gradient(#4fa6f0,#1a62c4);color:#fff;border-color:#1a62c4}
+.li small{opacity:.7;font-size:11px}
+.np{padding:8px 10px;font-size:13px}
+.np .big{display:flex;gap:10px}
+.np .big .art{width:78px;height:78px;font-size:30px;flex:none}
+.np b{display:block;font-size:14px;line-height:1.2}
+.prog{margin-top:14px;height:9px;border:1px solid #777;border-radius:5px;background:linear-gradient(#ddd,#fff);position:relative;overflow:hidden}
+.prog i{position:absolute;inset:0 62% 0 0;background:linear-gradient(#5fb0ff,#1a62c4)}
+.tm{display:flex;justify-content:space-between;font-size:11px;margin-top:3px;color:#444}
+.wheel{margin-top:30px;width:230px;height:230px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#fdfdfd,#d4d6da);box-shadow:0 2px 6px rgba(0,0,0,.35),inset 0 -3px 6px rgba(0,0,0,.12);position:relative;font-size:11px;font-weight:700;color:#6a6d73}
+.wheel span{position:absolute}
+.wheel .c{position:absolute;left:50%;top:50%;width:84px;height:84px;margin:-42px 0 0 -42px;border-radius:50%;background:radial-gradient(circle at 50% 30%,#fff,#d0d2d6);box-shadow:inset 0 0 6px rgba(0,0,0,.25),0 0 0 1px #aaa}
+
+/* ===== B. iTunes 10/11 ===== */
+.it{background:#fff;height:100%;display:flex;flex-direction:column;font-family:"Lucida Grande","Helvetica Neue",Arial,sans-serif}
+.it .top{background:linear-gradient(#e5e5e5,#a8a8a8);border-bottom:1px solid #666;padding:34px 12px 10px;display:flex;flex-direction:column;gap:8px}
+.ctl{display:flex;justify-content:center;gap:10px;align-items:center}
+.ctl b{width:30px;height:26px;border-radius:13px;background:linear-gradient(#fdfdfd,#b9b9b9);border:1px solid #777;box-shadow:inset 0 1px 0 #fff;display:flex;align-items:center;justify-content:center;font-size:11px;color:#333}
+.ctl b.p{width:40px;height:32px;border-radius:16px;font-size:14px}
+.disp{background:linear-gradient(#dfe6cf,#c8d1b4);border:1px solid #6e7560;border-radius:5px;box-shadow:inset 0 2px 4px rgba(0,0,0,.25);text-align:center;padding:5px 8px 6px;font-size:11px;color:#2a2f20}
+.disp b{display:block;font-size:12px}
+.disp .bar{height:5px;background:#9aa386;border-radius:3px;margin-top:5px;position:relative}.disp .bar i{position:absolute;inset:0 60% 0 0;background:#3a4a22;border-radius:3px}
+.seg{display:flex;margin:8px 12px;border:1px solid #6b7f9e;border-radius:5px;overflow:hidden;font-size:11px}
+.seg span{flex:1;text-align:center;padding:5px 0;background:linear-gradient(#fff,#d6dde8);border-right:1px solid #6b7f9e}
+.seg span:last-child{border:0}.seg .on{background:linear-gradient(#6c99d6,#3b6bb3);color:#fff;text-shadow:0 -1px 0 rgba(0,0,0,.4)}
+.th{display:flex;font-size:10px;color:#444;background:linear-gradient(#fafafa,#dcdcdc);border-top:1px solid #aaa;border-bottom:1px solid #999;padding:3px 10px}
+.th span:first-child{flex:1}
+.tr{display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:11.5px;border-bottom:1px solid #eef}
+.tr:nth-child(odd){background:#edf3fe}
+.tr.pl{background:linear-gradient(#5a96e6,#2f6fd0);color:#fff}
+.tr .art{width:30px;height:30px;font-size:13px;flex:none}
+.tr div{flex:1;min-width:0}.tr div b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tr small{opacity:.65;font-size:10px}
+
+/* ===== C. Cover Flow ===== */
+.cf{height:100%;background:linear-gradient(#1a1a1a,#000 70%);color:#eee;display:flex;flex-direction:column;font-family:"Lucida Grande","Helvetica Neue",Arial,sans-serif}
+.cf .head{padding:36px 14px 6px;text-align:center;font-size:12px;color:#aaa}
+.flow{height:230px;perspective:600px;position:relative;margin-top:10px}
+.flow .art{position:absolute;top:30px;width:110px;height:110px;font-size:36px;-webkit-box-reflect:below 2px linear-gradient(transparent 60%,rgba(255,255,255,.35));border-radius:2px}
+.flow .l2{left:-40px;transform:rotateY(60deg)}.flow .l1{left:30px;transform:rotateY(60deg)}
+.flow .m{left:75px;width:150px;height:150px;top:18px;font-size:50px}
+.flow .r1{right:30px;transform:rotateY(-60deg)}.flow .r2{right:-40px;transform:rotateY(-60deg)}
+.cap{text-align:center;font-size:12px;margin-top:6px}.cap b{display:block;font-size:13px}
+.cf .list{margin-top:10px;background:#fff;color:#222;flex:1;font-size:11.5px}
+.cf .tr:nth-child(odd){background:#f1f1f1}.cf .tr.pl{background:linear-gradient(#5a96e6,#2f6fd0);color:#fff}.cf .tr{border-color:#e6e6e6}
+.cf .tab{display:flex;background:linear-gradient(#444,#151515);border-top:1px solid #666;height:50px}
+.cf .tab span{flex:1;text-align:center;font-size:10px;color:#aaa;padding-top:8px}.cf .tab .on{color:#6db4ff}
+.note{font-size:12px;color:#555;max-width:760px;margin:0 auto}
+</style></head><body>
+<h1>On Air English 디자인 시안</h1>
+<p class="sub">같은 내용(BBC·NPR 뉴스)을 세 가지 옛 애플 스타일로 그렸어요. 화면은 실제 앱이 아니라 그림이에요.</p>
+
+<!-- A -->
+<section class="concept"><h2>A. 아이팟 클래식</h2>
+<p>위는 흑백 LCD 화면, 아래는 클릭휠. 휠을 돌려 목록을 넘기고, 가운데 버튼으로 선택, MENU로 뒤로 가요. 가장 "그 시절" 느낌이 강하고, 15초 이동은 ⏮ ⏭ 버튼에 넣어요.</p>
+<div class="row">
+ <div class="phone"><div class="scr"><div class="ipod">
+  <div class="lcd"><div class="tb"><span>▶</span><span>On Air</span><div class="bat"><i></i></div></div>
+   <div class="li sel"><span>오늘</span><span>›</span></div>
+   <div class="li"><span>헤드라인</span><span>›</span></div>
+   <div class="li"><span>지난 목록</span><span>›</span></div>
+   <div class="li"><span>저장함</span><span>›</span></div>
+   <div class="li"><span>지금 재생 중</span><span>›</span></div>
+   <div class="li"><span>속도</span><small>1.0x</small></div>
+   <div class="li"><span>설정</span><span>›</span></div></div>
+  <div class="wheel"><span style="top:14px;left:0;right:0;text-align:center">MENU</span><span style="left:18px;top:105px">⏮</span><span style="right:18px;top:105px">⏭</span><span style="bottom:14px;left:0;right:0;text-align:center">▶ ❚❚</span><div class="c"></div></div>
+ </div></div></div>
+ <div class="phone"><div class="scr"><div class="ipod">
+  <div class="lcd"><div class="tb"><span>▶</span><span>지금 재생 중</span><div class="bat"><i></i></div></div>
+   <div class="np"><div class="big"><div class="art a1">B</div><div><b>Global News Podcast</b>BBC World Service<br><small>1 / 5</small></div></div>
+   <div style="margin-top:14px"><b>Ceasefire talks resume in Cairo</b></div>
+   <div class="prog"><i></i></div><div class="tm"><span>6:42</span><span>-10:18</span></div></div></div>
+  <div class="wheel"><span style="top:14px;left:0;right:0;text-align:center">MENU</span><span style="left:18px;top:105px">⏮</span><span style="right:18px;top:105px">⏭</span><span style="bottom:14px;left:0;right:0;text-align:center">▶ ❚❚</span><div class="c"></div></div>
+ </div></div></div>
+</div></section>
+
+<!-- B -->
+<section class="concept"><h2>B. 올드 맥 아이튠즈 (10~11 시절)</h2>
+<p>회색 금속 느낌의 위쪽 막대, 초록빛 LCD 표시창, 파란 줄무늬 목록. 지금 앱과 구조가 가장 비슷해서 기능은 그대로 두고 겉모습만 바꾸기 좋아요.</p>
+<div class="row">
+ <div class="phone"><div class="scr"><div class="it">
+  <div class="top"><div class="ctl"><b>⏮</b><b class="p">▶</b><b>⏭</b></div>
+   <div class="disp"><b>Global News Podcast</b>BBC World Service<div class="bar"><i></i></div></div></div>
+  <div class="seg"><span class="on">오늘</span><span>지난 목록</span><span>저장함</span></div>
+  <div class="th"><span>이름</span><span>시간</span></div>
+  <div class="tr pl"><div class="art a1">B</div><div><b>Ceasefire talks resume in Cairo</b><small>BBC Global News</small></div>17:00</div>
+  <div class="tr"><div class="art a2">N</div><div><b>Top stories this hour</b><small>NPR News Now</small></div>5:00</div>
+  <div class="tr"><div class="art a3">U</div><div><b>Markets, a storm, and a vote</b><small>NPR Up First</small></div>14:20</div>
+  <div class="tr"><div class="art a4">6</div><div><b>6 Minute English: Slow travel</b><small>BBC 6 Minute English</small></div>6:10</div>
+  <div class="tr"><div class="art a5">S</div><div><b>Why do cats purr?</b><small>NPR Short Wave</small></div>12:35</div>
+ </div></div></div>
+ <div class="phone"><div class="scr"><div class="it">
+  <div class="top"><div class="ctl"><b>⏮</b><b class="p">❚❚</b><b>⏭</b></div>
+   <div class="disp"><b>Ceasefire talks resume in Cairo</b>BBC · 6:42 / 17:00<div class="bar"><i></i></div></div></div>
+  <div style="padding:30px;display:flex;flex-direction:column;align-items:center;gap:14px;flex:1;background:linear-gradient(#f7f7f7,#dfe3ea)">
+   <div class="art a1" style="width:190px;height:190px;font-size:70px;box-shadow:0 8px 18px rgba(0,0,0,.4)">B</div>
+   <div style="text-align:center;font-size:13px"><b>Global News Podcast</b><br><small style="color:#666">BBC World Service</small></div>
+   <div class="seg" style="width:100%"><span>-15초</span><span class="on">1.0x</span><span>+15초</span></div></div>
+ </div></div></div>
+</div></section>
+
+<!-- C -->
+<section class="concept"><h2>C. 커버 플로우</h2>
+<p>아이튠즈의 커버 플로우처럼 방송 표지를 옆으로 넘겨 고르는 방식. 시각적으로 가장 화려하고, 손가락으로 넘기기에 좋아요. 아래 목록과 탭바는 그대로 유지해요.</p>
+<div class="row">
+ <div class="phone"><div class="scr"><div class="cf">
+  <div class="head">On Air English</div>
+  <div class="flow"><div class="art a2 l2">N</div><div class="art a3 l1">U</div><div class="art a1 m">B</div><div class="art a4 r1">6</div><div class="art a5 r2">S</div></div>
+  <div class="cap"><b>Global News Podcast</b>BBC World Service</div>
+  <div class="list">
+   <div class="tr pl"><div class="art a1">B</div><div><b>Ceasefire talks resume in Cairo</b><small>BBC Global News</small></div>17:00</div>
+   <div class="tr"><div class="art a2">N</div><div><b>Top stories this hour</b><small>NPR News Now</small></div>5:00</div>
+   <div class="tr"><div class="art a3">U</div><div><b>Markets, a storm, and a vote</b><small>NPR Up First</small></div>14:20</div></div>
+  <div class="tab"><span class="on">오늘</span><span>지난 목록</span><span>저장함</span></div>
+ </div></div></div>
+</div></section>
+
+<p class="note">고르실 때 알려 주세요: ① A/B/C 중 하나(섞어도 돼요) ② 마음에 드는 점과 싫은 점. 정해지면 그 방향으로 실제 앱에 적용해요. 재생·저장·헤드라인 기능은 그대로 두고 겉모습만 바꿔요.</p>
+</body></html>
