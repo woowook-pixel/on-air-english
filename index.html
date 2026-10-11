@@ -35,6 +35,60 @@
   #vbox { position: fixed; left: 0; right: 0; top: calc(var(--pf-top) + var(--pf-touch)); height: 1px; opacity: 0; pointer-events: none; overflow: hidden; background: var(--pf-black); z-index: 2; }
   #vbox video { width: 100%; height: 100%; object-fit: contain; }
   body.np-video #vbox { height: min(56.25vw, 315px); opacity: 1; pointer-events: auto; }
+
+  /* ---------- 목록 행 ---------- */
+  .sc-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .sc-title { font: 500 16px/1.35 var(--pf-font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sc-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sc-arrow { flex: none; font: 700 14px/1 var(--pf-font); }
+  .sc-row.playing .sc-title { font-weight: 800; }
+  .sc-count { font: 700 11px/1 var(--pf-font); letter-spacing: 0.08em; color: var(--pf-gray); }
+  .pf-tabs { margin-bottom: 4px; }
+
+  /* ---------- 빈 상태 ---------- */
+  .sc-empty { box-shadow: inset 0 1px 0 var(--pf-black); padding: 26px 0; }
+  .sc-empty h2 { font: var(--pf-heading); letter-spacing: -0.02em; margin: 0 0 8px; }
+  .sc-empty p { margin: 0 0 8px; font: var(--pf-sub); color: var(--pf-gray); }
+  .sc-empty button { display: inline-flex; align-items: center; height: var(--pf-touch); font: var(--pf-action); letter-spacing: 0.08em; text-decoration: underline; text-underline-offset: 6px; }
+
+  /* ---------- 썸네일: 흑백, 모서리 없음 ---------- */
+  .sc-thumb { flex: none; position: relative; overflow: hidden; background: var(--pf-black); color: var(--pf-white); display: flex; align-items: center; justify-content: center; font: 900 22px/1 var(--pf-font); letter-spacing: -0.02em; }
+  .sc-thumb img, .sc-hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); }
+  .sc-hero { position: relative; overflow: hidden; aspect-ratio: 16 / 9; background: var(--pf-black); margin: 0 0 22px; }
+
+  /* ---------- 기사 ---------- */
+  .pf-title.sc-heading { font: var(--pf-heading); letter-spacing: -0.02em; }
+  .sc-text p { margin: 0 0 14px; font: var(--pf-body); }
+  .sc-note { margin: 4px 0 22px; }
+
+  /* ---------- 재생 화면 ---------- */
+  .sc-vspace { height: min(56.25vw, 315px); }
+  .sc-info { display: flex; gap: 16px; align-items: flex-end; margin-top: 28px; }
+  .sc-meta { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .sc-ptitle { font: 900 32px/1.12 var(--pf-font); letter-spacing: -0.025em; margin: 24px 0 12px; }
+  .sc-progress { position: relative; height: var(--pf-touch); touch-action: none; }
+  .sc-progress::before { content: ""; position: absolute; left: 0; right: 0; top: 21px; height: 2px; background: var(--pf-line); }
+  .sc-pos { position: absolute; top: 16px; left: 0; width: 4px; height: 12px; background: var(--pf-ember); }
+  .sc-times { display: flex; justify-content: space-between; font: 700 12px/1 var(--pf-font); font-variant-numeric: tabular-nums; }
+  .sc-transport { display: flex; align-items: center; justify-content: space-between; margin: 20px 0 26px; }
+  .sc-seek { min-width: var(--pf-touch); text-align: center; }
+  .sc-play { min-width: 96px; height: 56px; padding: 0 20px; background: var(--pf-black); color: var(--pf-white); font: 800 13px/1 var(--pf-font); letter-spacing: 0.12em; text-align: center; }
+
+  /* ---------- 미니 플레이어 ---------- */
+  .sc-mini { position: fixed; left: 0; right: 0; bottom: var(--pf-tabbar); height: 56px; display: none; align-items: center; gap: 12px; padding: 0 var(--pf-side); background: var(--pf-white); box-shadow: inset 0 1px 0 var(--pf-line); z-index: 20; }
+  body.has-mini .sc-mini { display: flex; }
+  body.has-mini .pf-screen { padding-bottom: calc(var(--pf-tabbar) + 56px + 24px); }
+  .sc-mini-open { flex: 1; min-width: 0; height: 56px; display: flex; align-items: center; gap: 12px; }
+  .sc-dot { flex: none; width: 7px; height: 7px; background: var(--pf-ember); }
+  .sc-mini-text { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .sc-mini-label { font: 800 10px/1 var(--pf-font); letter-spacing: 0.12em; }
+  .sc-mini-title { font: 500 14px/1.2 var(--pf-font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sc-mini .pf-action { flex: none; min-width: 56px; text-align: right; }
+
+  /* ---------- 알림 ---------- */
+  .sc-toast { position: fixed; left: var(--pf-side); right: var(--pf-side); bottom: calc(var(--pf-tabbar) + 12px); padding: 14px 16px; background: var(--pf-black); color: var(--pf-white); font: 700 12px/1.4 var(--pf-font); letter-spacing: 0.04em; opacity: 0; pointer-events: none; z-index: 30; }
+  .sc-toast.on { opacity: 1; }
+  body.has-mini .sc-toast { bottom: calc(var(--pf-tabbar) + 68px); }
 </style>
 </head>
 <body>
@@ -153,6 +207,7 @@ function flash(msg) {
 
 // ---------- 화면 전환 (스택) ----------
 const view = $('view');
+const setView = (...nodes) => view.replaceChildren(...nodes.flat().filter(Boolean));
 const curFn = () => state.stack[state.stack.length - 1];
 
 function syncChrome() {
@@ -235,10 +290,10 @@ function markPlaying() {
 // 오늘 목록 불러오기. 실패하면 빈 상태 화면을 보여 주고 false
 async function ensureLatest(bar, me) {
   if (state.latest) return true;
-  view.replaceChildren(bar(), emptyBlock('불러오는 중…'));
+  setView(bar(), emptyBlock('불러오는 중…'));
   try { state.latest = await fetchJSON('data/current.json'); }
   catch {
-    if (curFn() === me) view.replaceChildren(bar(), emptyBlock('불러오지 못했습니다.', '인터넷 연결을 확인해 주세요.', '다시 시도', () => me()));
+    if (curFn() === me) setView(bar(), emptyBlock('불러오지 못했습니다.', '인터넷 연결을 확인해 주세요.', '다시 시도', () => me()));
     return false;
   }
   return curFn() === me;
@@ -248,7 +303,7 @@ async function ensureLatest(bar, me) {
 async function renderListen() {
   if (!await ensureLatest(rootBar, renderListen)) return;
   const listening = state.latest.programs.filter(isMedia);
-  view.replaceChildren(
+  setView(
     rootBar(),
     titleblock(`오늘의 방송 ${listening.length}개`, '뉴스 듣기'),
     label('음성', listening.length),
@@ -261,7 +316,7 @@ async function renderListen() {
 async function renderRead() {
   if (!await ensureLatest(rootBar, renderRead)) return;
   const reading = state.latest.programs.filter(p => !isMedia(p));
-  view.replaceChildren(
+  setView(
     rootBar(),
     titleblock('오늘의 헤드라인', '기사 읽기'),
     label('글', reading.length),
@@ -274,7 +329,7 @@ function renderLibrary() {
   const me = renderLibrary;
   const body = h('div');
   const tab = (id, text) => h('button', { class: 'pf-tab', role: 'tab', 'aria-selected': String(state.lib === id), onclick: () => { state.lib = id; renderLibrary(); } }, text);
-  view.replaceChildren(
+  setView(
     rootBar(),
     titleblock(null, '보관함'),
     h('div', { class: 'pf-tabs', role: 'tablist' }, tab('past', '지난 목록'), tab('saved', '저장함')),
@@ -314,7 +369,7 @@ async function fillPast(body, me) {
 function renderEdition(ed) {
   const listening = ed.programs.filter(isMedia);
   const reading = ed.programs.filter(p => !isMedia(p));
-  view.replaceChildren(
+  setView(
     backBar(),
     titleblock('지난 목록', editionLabel(ed.id)),
     listening.length ? label('음성', listening.length) : null,
@@ -335,7 +390,7 @@ function renderArticle(p) {
     img.addEventListener('error', () => hero.remove());
     hero = h('div', { class: 'sc-hero' }, img);
   }
-  view.replaceChildren(
+  setView(
     backBar(),
     titleblock(subtitle(p), p.title, 'sc-heading'),
     hero,
@@ -353,12 +408,12 @@ function renderSettings() {
     state_.textContent = sound.on ? '켜짐' : '꺼짐';
     clickSound();
   });
-  view.replaceChildren(backBar(), titleblock(null, '설정'), label('소리'), list([b]));
+  setView(backBar(), titleblock(null, '설정'), label('소리'), list([b]));
 }
 
 function renderPlayer() {
   const p = state.current;
-  if (!p) { view.replaceChildren(backBar(), emptyBlock('아직 없습니다.', '재생 중인 방송이 없어요.')); return; }
+  if (!p) { setView(backBar(), emptyBlock('아직 없습니다.', '재생 중인 방송이 없어요.')); return; }
   const rows = [textRow('다음 방송 →', playNext)];
   if (hasLink(p)) rows.push(textRow(`원문 열기 (${src(p).short}) ↗`, () => window.open(p.source, '_blank', 'noopener')));
   rows.push(saveRow(p));
@@ -372,7 +427,7 @@ function renderPlayer() {
   bar.addEventListener('pointerdown', e => { dragging = true; try { bar.setPointerCapture(e.pointerId); } catch {} seekTo(e); });
   bar.addEventListener('pointermove', e => { if (dragging) seekTo(e); });
   ['pointerup', 'pointercancel'].forEach(t => bar.addEventListener(t, () => { dragging = false; }));
-  view.replaceChildren(
+  setView(
     backBar(),
     p.media === 'video' ? h('div', { class: 'sc-vspace' }) : null,
     h('div', { class: 'sc-info' },
