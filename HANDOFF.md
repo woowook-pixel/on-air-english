@@ -4,7 +4,7 @@
 
 ## 이 프로젝트
 
-앱 이름은 **On Air Classic**(홈 화면에는 짧게 "On Air"). 아이콘은 은색 클릭휠 + 빨간 "방송 중" 램프(`icons/icon.svg`가 원본, PNG는 여기서 만든다).
+앱 이름은 **Script**(구 On Air, 구 On Air Classic). 개인 앱 패밀리 공통 디자인을 따른다: 기준은 `design/DESIGN.md`, 이 앱 전용 기준은 `design/SCRIPT.md`, 색·글자·부품 클래스는 `design/tokens.css`. 흑백, 모서리 없음, 그림자·그라데이션 없음, Ember(#FF7A3D)는 "지금 재생 중" 표시에만 쓴다. 아이콘 원본은 `design/icons/script.svg`(복사본이 `icons/`에 있다).
 
 영어 뉴스로 듣기·읽기를 공부하는 웹앱(PWA). 사용자는 아이폰 홈 화면에 설치해서 쓴다.
 
@@ -17,9 +17,10 @@
 
 | 파일 | 역할 |
 |---|---|
-| `index.html` | 앱 전체. **아이팟 클래식 스타일**(위는 LCD 화면, 아래는 클릭휠). 메뉴(뉴스 듣기 🎧 / 기사 읽기 📄 / 지난 목록 / 저장함 / 지금 재생 중 / 설정, 줄 앞 색 아이콘과 "음성"/"기사" 태그로 구분. 설정 메뉴에서 클릭 소리 켜기/끄기, 기본 꺼짐) → 목록 → 상세·재생 화면의 스택 구조. 휠을 돌리면 선택·스크롤, MENU는 뒤로, ◀◀▶▶는 15초 이동(▶▶ 길게 누르면 다음 방송), 가운데 버튼은 선택. 속도 조절 기능은 사용자 요청으로 뺐다. 시안은 `mockups/` |
+| `index.html` | 앱 전체(HTML+CSS+JS). 하단 탭 3개: 듣기 / 읽기 / 보관함(밑줄 탭: 지난 목록, 저장함). 상단 바 "설정", 탭바 위 미니 플레이어(재생 중일 때만), 재생 화면은 −15 −5 PLAY +5 +15 텍스트 버튼. 아이팟 스킨과 클릭휠은 제거했고 옵션으로도 남기지 않는다. 속도 조절 기능은 없다 |
 | `scripts/update.py` | 매일 새 목록 생성 → `data/current.json`, 이전 목록은 `data/archive/<id>.json` + `index.json`, 이미 쓴 항목은 `data/state.json` |
 | `.github/workflows/update.yml` | 매일 06:00 KST에 `update.py` 실행 → 커밋 → Pages 배포. 수동 실행 시 `force` 옵션으로 즉시 새 목록 |
+| `design/` | 패밀리 공통 디자인 기준 문서, 토큰 CSS, 아이콘. 앱에서 쓰는 것은 `tokens.css` |
 | `sw.js` | 앱 화면 캐시(네트워크 우선). 화면을 바꾸면 `CACHE` 버전을 올릴 것 |
 | `manifest.webmanifest`, `icons/` | 설치용 |
 
