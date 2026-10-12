@@ -4,7 +4,7 @@
 
 ## 이 프로젝트
 
-앱 이름은 **Script**(구 On Air, 구 On Air Classic). 개인 앱 패밀리 공통 디자인을 따른다: 기준은 `design/DESIGN.md`, 이 앱 전용 기준은 `design/SCRIPT.md`, 색·글자·부품 클래스는 `design/tokens.css`. 흑백, 모서리 없음, 그림자·그라데이션 없음, Ember(#FF7A3D)는 "지금 재생 중" 표시에만 쓴다. 아이콘 원본은 `design/icons/script.svg`(복사본이 `icons/`에 있다).
+앱 이름은 **Script**(구 On Air, 구 On Air Classic). 개인 앱 패밀리 공통 디자인을 따른다: 공통 CSS(색·글자·부품 클래스)는 중앙 주소 https://personal-design-rho.vercel.app/v1/tokens.css 에서 불러오고(복사본 없음, 적용 상태는 `design/APPLIED.md`), 이 앱 전용 기준은 `design/SCRIPT.md`. 흑백, 모서리 없음, 그림자·그라데이션 없음, Ember(#FF7A3D)는 "지금 재생 중" 표시에만 쓴다. 아이콘 원본은 `design/icons/script.svg`(복사본이 `icons/`에 있다).
 
 영어 뉴스로 듣기·읽기를 공부하는 웹앱(PWA). 사용자는 아이폰 홈 화면에 설치해서 쓴다.
 
@@ -20,7 +20,7 @@
 | `index.html` | 앱 전체(HTML+CSS+JS). 하단 탭 3개: 듣기 / 읽기 / 보관함(밑줄 탭: 지난 목록, 저장함). 상단 바 "설정", 탭바 위 미니 플레이어(재생 중일 때만), 재생 화면은 −15 −5 PLAY +5 +15 텍스트 버튼. 아이팟 스킨과 클릭휠은 제거했고 옵션으로도 남기지 않는다. 속도 조절 기능은 없다 |
 | `scripts/update.py` | 매일 새 목록 생성 → `data/current.json`, 이전 목록은 `data/archive/<id>.json` + `index.json`, 이미 쓴 항목은 `data/state.json` |
 | `.github/workflows/update.yml` | 매일 06:00 KST에 `update.py` 실행 → 커밋 → Pages 배포. 수동 실행 시 `force` 옵션으로 즉시 새 목록 |
-| `design/` | 패밀리 공통 디자인 기준 문서, 토큰 CSS, 아이콘. 앱에서 쓰는 것은 `tokens.css` |
+| `design/` | 이 앱 전용 디자인 기준(`SCRIPT.md`), 아이콘 원본, 적용된 공통 CSS 버전 기록(`APPLIED.md`). 공통 `tokens.css`는 중앙에서 불러온다 |
 | `sw.js` | 앱 화면 캐시(네트워크 우선). 화면을 바꾸면 `CACHE` 버전을 올릴 것 |
 | `manifest.webmanifest`, `icons/` | 설치용 |
 
