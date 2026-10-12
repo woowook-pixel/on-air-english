@@ -22,7 +22,8 @@
 | `.github/workflows/update.yml` | 매일 06:00 KST에 `update.py` 실행 → 커밋 → Pages 배포. 수동 실행 시 `force` 옵션으로 즉시 새 목록 |
 | `design/` | 이 앱 전용 디자인 기준(`SCRIPT.md`), 아이콘 원본, 적용된 공통 CSS 버전 기록(`APPLIED.md`). 공통 `tokens.css`는 중앙에서 불러온다 |
 | `sw.js` | 앱 화면 캐시(네트워크 우선). 화면을 바꾸면 `CACHE` 버전을 올릴 것 |
-| `manifest.webmanifest`, `icons/` | 설치용. `index.html`의 apple-touch-icon은 파일 주소가 아니라 data 주소로 직접 들어 있다(iOS가 파일 주소 아이콘을 못 받아 회색 글자 타일이 나오는 문제 회피). 아이콘 이미지를 바꾸면 `python3 scripts/embed_apple_icon.py`를 다시 실행할 것 |
+| `manifest.webmanifest`, `icons/` | 설치용. 홈 화면 아이콘(apple-touch-icon, favicon, manifest icons)은 중앙 픽셀 아이콘 `https://personal-design-rho.vercel.app/icons/pixel/script-*.png/.svg`를 가리킨다. `icons/`의 파일은 지우지 않고 남겨 두었다(참조 안 함). iOS가 파일 주소 아이콘을 못 받아 회색 글자 타일이 나오는 문제가 있었으니, 아이콘이 안 보이면 가장 먼저 의심할 것 |
+| `version.json` | 배포 때 워크플로가 만든다(저장소에는 없음). 값은 커밋 SHA이고 `index.html`의 `APP_VERSION`도 같은 값으로 채운다. 앱이 열릴 때·돌아올 때·5분마다 비교해 다르면 "새 버전이 있습니다" 띠를 띄운다 |
 
 ### 콘텐츠 소스 (현재)
 
