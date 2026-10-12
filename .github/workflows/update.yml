@@ -44,6 +44,14 @@ jobs:
           git add data
           git diff --cached --quiet || (git commit -m "Update program list $(TZ=Asia/Seoul date +%F)" && git push)
 
+      # 새 버전 알림용: 배포본의 version.json과 앱 코드의 APP_VERSION을 같은 값(커밋 SHA)으로 채운다
+      - name: Stamp version
+        run: |
+          VERSION=$(git rev-parse --short HEAD)
+          printf '{"version":"%s"}\n' "$VERSION" > version.json
+          sed -i "s/__APP_VERSION__/$VERSION/" index.html
+          grep -q "const APP_VERSION = '$VERSION'" index.html
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
