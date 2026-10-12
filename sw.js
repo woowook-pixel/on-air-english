@@ -1,6 +1,6 @@
 // 앱 화면은 캐시해서 오프라인에서도 열리게 하고, 목록 데이터는 항상 네트워크를 먼저 확인한다.
-const CACHE = 'script-v13';
-const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
+const CACHE = 'script-v15';
+const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png?v=2', 'icons/icon-512.png?v=2'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
