@@ -22,7 +22,7 @@
 | `.github/workflows/update.yml` | 매일 06:00 KST에 `update.py` 실행 → 커밋 → Pages 배포. 수동 실행 시 `force` 옵션으로 즉시 새 목록 |
 | `design/` | 이 앱 전용 디자인 기준(`SCRIPT.md`), 아이콘 원본, 적용된 공통 CSS 버전 기록(`APPLIED.md`). 공통 `tokens.css`는 중앙에서 불러온다 |
 | `sw.js` | 앱 화면 캐시(네트워크 우선). 화면을 바꾸면 `CACHE` 버전을 올릴 것 |
-| `manifest.webmanifest`, `icons/` | 설치용 |
+| `manifest.webmanifest`, `icons/` | 설치용. `index.html`의 apple-touch-icon은 파일 주소가 아니라 data 주소로 직접 들어 있다(iOS가 파일 주소 아이콘을 못 받아 회색 글자 타일이 나오는 문제 회피). 아이콘 이미지를 바꾸면 `python3 scripts/embed_apple_icon.py`를 다시 실행할 것 |
 
 ### 콘텐츠 소스 (현재)
 
