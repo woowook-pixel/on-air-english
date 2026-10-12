@@ -32,7 +32,7 @@
   a { color: inherit; }
   .pf-screen { max-width: 560px; margin: 0 auto; }
   .sc-row { width: 100%; text-align: left; }
-  #vbox { position: fixed; left: 0; right: 0; top: calc(var(--pf-top) + var(--pf-touch)); height: 1px; opacity: 0; pointer-events: none; overflow: hidden; background: var(--pf-black); z-index: 2; }
+  #vbox { position: fixed; left: 0; right: 0; top: calc(env(safe-area-inset-top, 0px) + var(--pf-touch)); height: 1px; opacity: 0; pointer-events: none; overflow: hidden; background: var(--pf-black); z-index: 2; }
   #vbox video { width: 100%; height: 100%; object-fit: contain; }
   body.np-video #vbox { height: min(56.25vw, 315px); opacity: 1; pointer-events: auto; }
 
@@ -245,11 +245,12 @@ function setTab(tab) {
 }
 
 // ---------- 공통 부품 ----------
-const topbar = (label, onClick) => h('div', { class: 'pf-topbar' },
+const header = (left, actions) => h('header', { class: 'pf-header' },
+  h('div', { class: 'pf-topbar' }, left, actions ? h('div', { class: 'pf-actions' }, actions) : null));
+const rootBar = () => header(
   h('span', { class: 'pf-wordmark' }, 'Script'),
-  h('button', { class: 'pf-action', onclick: onClick }, label));
-const rootBar = () => topbar('설정', () => show(renderSettings, true));
-const backBar = () => topbar('← 목록', goBack);
+  h('button', { class: 'pf-action', onclick: () => show(renderSettings, true) }, '설정'));
+const backBar = () => header(h('button', { class: 'pf-action', onclick: goBack }, '← 목록'));
 const titleblock = (eyebrow, title, cls) => h('div', { class: 'pf-titleblock' },
   eyebrow ? h('div', { class: 'pf-eyebrow' }, eyebrow) : null,
   h('h1', { class: 'pf-title' + (cls ? ' ' + cls : '') }, title));
