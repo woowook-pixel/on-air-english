@@ -11,8 +11,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800;900&family=Noto+Sans+KR:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;600;700&display=swap">
 <link rel="stylesheet" href="https://personal-design-rho.vercel.app/v1/tokens.css">
+<script src="https://personal-design-rho.vercel.app/v1/symbols.js" defer></script>
 <link rel="icon" href="https://personal-design-rho.vercel.app/icons/pixel/script.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" sizes="180x180" href="https://personal-design-rho.vercel.app/icons/pixel/script-180.png">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAABuElEQVR42u3d0QnCMBRAUSNd4GUOF3MiF3OOzOCHCP0o/pRoXnLOBG28PCGkpETEBY5cLQHiQByIA3EgDsSBOBAH4kAcIA7EgTgQB+JAHIgDcSAOxAHiQByIA3EgDsSBOBAH4kAcIA7EgTgQB+JAHIgDcSAOxMG6tqTP3VpL9LS1VpMDfyuIA3GAOBAH4kAc/M+4m2Dft7lybSslfReTA3EgDsSBOBAH4kAciIPplYiY761+f4gw6UFAkwNxIA7EgTgQB+JAHIiDxc25Q4rJgTgQB+JAHIgDcSAO2On+IXWnE3szfUg97CKYHIgDcSAOxIE4EAfiQBxMb7n7Vs7sKua65MXkQByIA3EgDsSBOBAHiANxIA7EgTgQB+JAHIgDcYA4EAfiQByIA3EgDsSBOBAH69pWe+F2v/nVTQ7EgTgQB+JAHIgDcSAOeOu+QzrarTlndkhz3QBkciAOxIE4EAfiQByIAz42S7BXH0+LYHIgDsSBOBAH4kAciANxsI4SEVYBkwNxIA7EgTgQB+JAHIgDcYA4EAfiQByIA3EgDsSBOBAHiANxIA7EgTgQB+JAHIgDcSAOOPYCR9oe+BiDYRIAAAAASUVORK5CYII=">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Script">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -32,6 +33,10 @@
   a { color: inherit; }
   .pf-screen { max-width: 560px; margin: 0 auto; }
   .sc-row { width: 100%; text-align: left; }
+  .pf-action:has(> pf-sym), .pf-update button:has(> pf-sym), .sc-play, .sc-withsym { display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+  .sc-withsym { display: flex; justify-content: flex-start; }
+  .sc-arrow { display: inline-flex; align-items: center; }
+  .pf-tabbar button { flex-direction: column; gap: 4px; }
   #vbox { position: fixed; left: 0; right: 0; top: calc(env(safe-area-inset-top, 0px) + var(--pf-touch)); height: 1px; opacity: 0; pointer-events: none; overflow: hidden; background: var(--pf-black); z-index: 2; }
   #vbox video { width: 100%; height: 100%; object-fit: contain; }
   body.np-video #vbox { height: min(56.25vw, 315px); opacity: 1; pointer-events: auto; }
@@ -100,19 +105,19 @@
     <span class="sc-dot" aria-hidden="true"></span>
     <span class="sc-mini-text"><span class="sc-mini-label">NOW PLAYING</span><span class="sc-mini-title" id="miniTitle"></span></span>
   </button>
-  <button class="pf-action" id="miniPlay" aria-label="재생">PLAY</button>
+  <button class="pf-action" id="miniPlay" aria-label="재생"><pf-sym name="play"></pf-sym>PLAY</button>
 </div>
 
 <nav class="pf-tabbar" id="tabs" aria-label="메인 메뉴">
-  <button data-tab="listen">듣기</button>
-  <button data-tab="read">읽기</button>
-  <button data-tab="library">보관함</button>
+  <button data-tab="listen"><pf-sym name="listen"></pf-sym><span>듣기</span></button>
+  <button data-tab="read"><pf-sym name="read"></pf-sym><span>읽기</span></button>
+  <button data-tab="library"><pf-sym name="archive"></pf-sym><span>보관함</span></button>
 </nav>
 
 <div class="pf-update" id="update" role="status" hidden>
   <span class="pf-update-text">새 버전이 있습니다</span>
   <button type="button" class="pf-update-later">나중에</button>
-  <button type="button" class="pf-update-reload">새로고침</button>
+  <button type="button" class="pf-update-reload"><pf-sym name="refresh"></pf-sym>새로고침</button>
 </div>
 
 <div id="vbox"><video id="media" playsinline preload="metadata"></video></div>
@@ -252,12 +257,13 @@ function setTab(tab) {
 }
 
 // ---------- 공통 부품 ----------
+const sym = name => h('pf-sym', { name });
 const header = (left, actions) => h('header', { class: 'pf-header' },
   h('div', { class: 'pf-topbar' }, left, actions ? h('div', { class: 'pf-actions' }, actions) : null));
 const rootBar = () => header(
   h('span', { class: 'pf-wordmark' }, 'Script'),
-  h('button', { class: 'pf-action', onclick: () => show(renderSettings, true) }, '설정'));
-const backBar = () => header(h('button', { class: 'pf-action', onclick: goBack }, '← 목록'));
+  h('button', { class: 'pf-action', onclick: () => show(renderSettings, true) }, sym('settings'), '설정'));
+const backBar = () => header(h('button', { class: 'pf-action', onclick: goBack }, sym('arrow-left'), '목록'));
 const titleblock = (eyebrow, title, cls) => h('div', { class: 'pf-titleblock' },
   eyebrow ? h('div', { class: 'pf-eyebrow' }, eyebrow) : null,
   h('h1', { class: 'pf-title' + (cls ? ' ' + cls : '') }, title));
@@ -269,19 +275,23 @@ function row({ title, sub, key, onSelect }) {
     h('span', { class: 'sc-body' },
       h('span', { class: 'sc-title' }, title),
       sub ? h('span', { class: 'pf-row-sub sc-sub' }, sub) : null),
-    h('span', { class: 'sc-arrow', 'aria-hidden': 'true' }, '→'));
+    h('span', { class: 'sc-arrow', 'aria-hidden': 'true' }, sym('arrow-right')));
   b.addEventListener('click', onSelect);
   return b;
 }
-function textRow(text, onSelect) {
-  const b = h('button', { class: 'pf-row sc-row' }, h('span', { class: 'sc-body' }, h('span', { class: 'sc-title' }, text)));
+function textRow(text, onSelect, endSym) {
+  const b = h('button', { class: 'pf-row sc-row' },
+    h('span', { class: 'sc-body' }, h('span', { class: 'sc-title' }, text)),
+    endSym ? h('span', { class: 'sc-arrow', 'aria-hidden': 'true' }, sym(endSym)) : null);
   b.addEventListener('click', onSelect);
   return b;
 }
 function saveRow(p) {
-  const t = h('span', { class: 'sc-title' }, isSaved(p) ? '★ 저장됨' : '☆ 저장');
-  const b = h('button', { class: 'pf-row sc-row' }, h('span', { class: 'sc-body' }, t));
-  b.addEventListener('click', () => { t.textContent = toggleSave(p) ? '★ 저장됨' : '☆ 저장'; });
+  const holder = h('span', { class: 'sc-title sc-withsym' });
+  const draw = on => holder.replaceChildren(sym(on ? 'star-fill' : 'star'), on ? '저장됨' : '저장');
+  draw(isSaved(p));
+  const b = h('button', { class: 'pf-row sc-row' }, h('span', { class: 'sc-body' }, holder));
+  b.addEventListener('click', () => draw(toggleSave(p)));
   return b;
 }
 function emptyBlock(title, text, actionLabel, onAction) {
@@ -390,7 +400,7 @@ function renderEdition(ed) {
 function renderArticle(p) {
   const paras = p.summary ? [p.summary] : (p.paragraphs || []).map(t => t.replace(/[{}]/g, ''));
   const rows = [];
-  if (hasLink(p)) rows.push(textRow(`원문 열기 (${src(p).short}) ↗`, () => window.open(p.source, '_blank', 'noopener')));
+  if (hasLink(p)) rows.push(textRow(`원문 열기 (${src(p).short})`, () => window.open(p.source, '_blank', 'noopener'), 'arrow-up-right'));
   rows.push(saveRow(p));
   let hero = null;
   if (p.image && /^https:\/\//.test(p.image)) {
@@ -422,8 +432,8 @@ function renderSettings() {
 function renderPlayer() {
   const p = state.current;
   if (!p) { setView(backBar(), emptyBlock('아직 없습니다.', '재생 중인 방송이 없어요.')); return; }
-  const rows = [textRow('다음 방송 →', playNext)];
-  if (hasLink(p)) rows.push(textRow(`원문 열기 (${src(p).short}) ↗`, () => window.open(p.source, '_blank', 'noopener')));
+  const rows = [textRow('다음 방송', playNext, 'arrow-right')];
+  if (hasLink(p)) rows.push(textRow(`원문 열기 (${src(p).short})`, () => window.open(p.source, '_blank', 'noopener'), 'arrow-up-right'));
   rows.push(saveRow(p));
   const seekBtn = (text, aria, sec) => h('button', { class: 'pf-action sc-seek', 'aria-label': aria, onclick: () => { clickSound(); seekBy(sec); } }, text);
   const bar = h('div', { class: 'sc-progress', id: 'npBar', role: 'slider', 'aria-label': '재생 위치' }, h('div', { class: 'sc-pos', id: 'npPos' }));
@@ -448,7 +458,7 @@ function renderPlayer() {
     h('div', { class: 'sc-times' }, h('span', { id: 'tNow' }, '0:00'), h('span', { id: 'tLeft' }, '-0:00')),
     h('div', { class: 'sc-transport' },
       seekBtn('−15', '15초 뒤로', -15), seekBtn('−5', '5초 뒤로', -5),
-      h('button', { class: 'sc-play', id: 'npPlay', onclick: () => { clickSound(); togglePlay(); } }, 'PLAY'),
+      h('button', { class: 'sc-play', id: 'npPlay', onclick: () => { clickSound(); togglePlay(); } }, sym('play'), 'PLAY'),
       seekBtn('+5', '5초 앞으로', 5), seekBtn('+15', '15초 앞으로', 15)),
     list(rows));
   updateNP();
@@ -518,9 +528,10 @@ function playNext() {
 function syncPlayState() {
   const text = media.paused ? 'PLAY' : 'STOP';
   const label = media.paused ? '재생' : '정지';
-  $('miniPlay').textContent = text; $('miniPlay').setAttribute('aria-label', label);
+  const s_ = media.paused ? 'play' : 'stop';
+  $('miniPlay').replaceChildren(sym(s_), text); $('miniPlay').setAttribute('aria-label', label);
   const np = $('npPlay');
-  if (np) { np.textContent = text; np.setAttribute('aria-label', label); }
+  if (np) { np.replaceChildren(sym(s_), text); np.setAttribute('aria-label', label); }
   if ('mediaSession' in navigator && state.current) {
     navigator.mediaSession.playbackState = media.paused ? 'paused' : 'playing';
   }
