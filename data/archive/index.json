@@ -1,6 +1,23 @@
 {
  "editions": [
   {
+   "id": "2026-10-13",
+   "date": "2026-10-13",
+   "titles": [
+    "French supermarkets say fridges targeted in cyberattack",
+    "5pm ET, October 12 | The latest headlines from NPR",
+    "Trump Pressures Ukraine, Trump's Midterm Priorities, Saudi Arabia Airport Attacks",
+    "Living with debt",
+    "When is your brain actually 'adult'?",
+    "Six Ukrainian energy sites hit by Russia since Trump announced ceasefire, Zelensky says",
+    "Why Moscow is staying tight-lipped on Trump's energy ceasefire",
+    "Storm Rachel batters Southern California, brings flooding to Las Vegas",
+    "AI minister warns 'likely' UK's cyber defences will be breached",
+    "Federal agents search Rep. Ilhan Omar's DC home, DOJ says it approved the warrant",
+    "Both Russia and Ukraine are using AI-powered drones on the battlefield"
+   ]
+  },
+  {
    "id": "2026-10-12",
    "date": "2026-10-12",
    "titles": [
