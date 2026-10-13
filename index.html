@@ -261,7 +261,9 @@ const sym = name => h('pf-sym', { name });
 const header = (left, actions) => h('header', { class: 'pf-header' },
   h('div', { class: 'pf-topbar' }, left, actions ? h('div', { class: 'pf-actions' }, actions) : null));
 const rootBar = () => header(
-  h('span', { class: 'pf-wordmark' }, 'Script'),
+  h('span', { class: 'pf-brand' },
+    h('span', { class: 'pf-wordmark' }, 'Script'),
+    h('img', { class: 'pf-brand-icon', src: 'design/shared/icons/script.svg', alt: '', width: '20', height: '20' })),
   h('button', { class: 'pf-action', onclick: () => show(renderSettings, true) }, sym('settings'), '설정'));
 const backBar = () => header(h('button', { class: 'pf-action', onclick: goBack }, sym('arrow-left'), '목록'));
 const titleblock = (eyebrow, title, cls) => h('div', { class: 'pf-titleblock' },
