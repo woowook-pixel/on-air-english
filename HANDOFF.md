@@ -4,7 +4,7 @@
 
 ## 이 프로젝트
 
-앱 이름은 **Script**(구 On Air, 구 On Air Classic). 개인 앱 패밀리 공통 디자인을 따른다: 공통 CSS(색·글자·부품 클래스)는 중앙 주소 https://personal-design-rho.vercel.app/v1/tokens.css 에서 불러오고(복사본 없음, 적용 상태는 `design/APPLIED.md`), 이 앱 전용 기준은 `design/SCRIPT.md`. 흑백, 모서리 없음, 그림자·그라데이션 없음, Ember(#FF7A3D)는 "지금 재생 중" 표시에만 쓴다. 아이콘 원본은 `design/icons/script.svg`(복사본이 `icons/`에 있다).
+앱 이름은 **Script**(구 On Air, 구 On Air Classic). 개인 앱 패밀리 공통 디자인을 따른다: 공통 파일은 `design/shared/`(자동 동기화, 직접 고치지 말 것)에서 같은 도메인으로 불러오고(적용 상태는 `design/APPLIED.md`), 이 앱 전용 기준은 `design/SCRIPT.md`. 흑백, 모서리 없음, 그림자·그라데이션 없음, Ember(#FF7A3D)는 "지금 재생 중" 표시에만 쓴다. 아이콘 원본은 `design/icons/script.svg`(복사본이 `icons/`에 있다).
 
 영어 뉴스로 듣기·읽기를 공부하는 웹앱(PWA). 사용자는 아이폰 홈 화면에 설치해서 쓴다.
 
@@ -22,7 +22,7 @@
 | `.github/workflows/update.yml` | 매일 06:00 KST에 `update.py` 실행 → 커밋 → Pages 배포. 수동 실행 시 `force` 옵션으로 즉시 새 목록 |
 | `design/` | 이 앱 전용 디자인 기준(`SCRIPT.md`), 아이콘 원본, 적용된 공통 CSS 버전 기록(`APPLIED.md`). 공통 `tokens.css`는 중앙에서 불러온다 |
 | `sw.js` | 앱 화면 캐시(네트워크 우선). 화면을 바꾸면 `CACHE` 버전을 올릴 것 |
-| `manifest.webmanifest`, `icons/` | 설치용. 홈 화면 아이콘(apple-touch-icon, favicon, manifest icons)은 중앙 픽셀 아이콘 `https://personal-design-rho.vercel.app/icons/pixel/script-*.png/.svg`를 가리킨다. `icons/`의 파일은 지우지 않고 남겨 두었다(참조 안 함). iOS가 파일 주소 아이콘을 못 받아 회색 글자 타일이 나오는 문제가 있었으니, 아이콘이 안 보이면 가장 먼저 의심할 것 |
+| `manifest.webmanifest` | 설치용. manifest icons와 favicon은 `design/shared/icons/`를 가리킨다. apple-touch-icon은 `index.html`에 `__APPLE_TOUCH_ICON__` 자리만 있고, 배포 워크플로가 `scripts/embed_apple_icon.py`로 `design/shared/icons/apple-touch-icon.datauri.txt`를 넣고 검증한다(iOS가 파일 주소 아이콘을 못 받아 회색 글자 타일이 나오는 문제 회피). 로컬에서 이 스크립트를 돌렸다면 `git checkout index.html` |
 | `version.json` | 배포 때 워크플로가 만든다(저장소에는 없음). 값은 커밋 SHA이고 `index.html`의 `APP_VERSION`도 같은 값으로 채운다. 앱이 열릴 때·돌아올 때·5분마다 비교해 다르면 "새 버전이 있습니다" 띠를 띄운다 |
 
 ### 콘텐츠 소스 (현재)
