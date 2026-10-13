@@ -11,13 +11,13 @@
   "theme_color": "#FFFFFF",
   "icons": [
     {
-      "src": "https://personal-design-rho.vercel.app/icons/pixel/script-192.png",
+      "src": "design/shared/icons/script-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://personal-design-rho.vercel.app/icons/pixel/script-512.png",
+      "src": "design/shared/icons/script-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"

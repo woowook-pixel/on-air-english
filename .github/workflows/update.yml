@@ -52,6 +52,10 @@ jobs:
           sed -i "s/__APP_VERSION__/$VERSION/" index.html
           grep -q "const APP_VERSION = '$VERSION'" index.html
 
+      # 홈 화면 아이콘: design/shared의 data 주소를 index.html에 넣고 검증한다(회색 글자 타일 문제 회피)
+      - name: Embed apple-touch-icon
+        run: python3 scripts/embed_apple_icon.py
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

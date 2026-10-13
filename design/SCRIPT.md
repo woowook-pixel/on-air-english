@@ -89,7 +89,7 @@
 
 ## 아이콘
 
-- `icons/script.svg` 원본
-- `icons/script-180.png` → apple-touch-icon
-- `icons/script-192.png`, `icons/script-512.png` → manifest icons(있다면)
+- `design/shared/icons/script.svg` 원본
+- apple-touch-icon은 `design/shared/icons/apple-touch-icon.datauri.txt`(data 주소)를 배포 때 넣는다
+- `design/shared/icons/script-192.png`, `script-512.png` → manifest icons
 - `theme_color`, `background_color`는 #FFFFFF
