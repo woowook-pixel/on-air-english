@@ -1,5 +1,5 @@
 // 앱 화면은 캐시해서 오프라인에서도 열리게 하고, 목록 데이터는 항상 네트워크를 먼저 확인한다.
-const CACHE = 'script-v19';
+const CACHE = 'script-v20';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest'];
 
 self.addEventListener('install', e => {
