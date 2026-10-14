@@ -265,7 +265,7 @@ const rootBar = () => header(
     h('span', { class: 'pf-wordmark' }, 'Script'),
     h('picture', null,
       h('source', { srcset: 'design/shared/characters/script-still.png', media: '(prefers-reduced-motion: reduce)' }),
-      h('img', { class: 'pf-brand-character', src: 'design/shared/characters/script.gif', alt: '', width: '24', height: '24' }))),
+      h('img', { class: 'pf-brand-character', src: 'design/shared/characters/script.gif', alt: '', width: '52', height: '28' }))),
   h('button', { class: 'pf-action', onclick: () => show(renderSettings, true) }, sym('settings'), '설정'));
 const backBar = () => header(h('button', { class: 'pf-action', onclick: goBack }, sym('arrow-left'), '목록'));
 const titleblock = (eyebrow, title, cls) => h('div', { class: 'pf-titleblock' },
@@ -595,7 +595,9 @@ const getLater = () => { try { return sessionStorage.getItem(laterKey); } catch 
 function showUpdate(version) {
   updateBar.dataset.version = version;
   updateBar.hidden = false;
-  document.documentElement.style.setProperty('--sc-update-h', updateBar.offsetHeight + 'px');
+  // 띠 위쪽 끝이 탭바 위쪽 끝에서 얼마나 떨어져 있는지(띠 높이 + 공통 CSS가 준 아래 간격)만큼 미니 플레이어 등을 올린다
+  const gap = document.querySelector('.pf-tabbar').getBoundingClientRect().top - updateBar.getBoundingClientRect().top;
+  document.documentElement.style.setProperty('--sc-update-h', Math.max(gap, updateBar.offsetHeight) + 'px');
 }
 function hideUpdate() {
   updateBar.hidden = true;
