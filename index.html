@@ -263,7 +263,9 @@ const header = (left, actions) => h('header', { class: 'pf-header' },
 const rootBar = () => header(
   h('span', { class: 'pf-brand' },
     h('span', { class: 'pf-wordmark' }, 'Script'),
-    h('img', { class: 'pf-brand-icon', src: 'design/shared/icons/script.svg', alt: '', width: '20', height: '20' })),
+    h('picture', null,
+      h('source', { srcset: 'design/shared/characters/script-still.png', media: '(prefers-reduced-motion: reduce)' }),
+      h('img', { class: 'pf-brand-character', src: 'design/shared/characters/script.gif', alt: '', width: '24', height: '24' }))),
   h('button', { class: 'pf-action', onclick: () => show(renderSettings, true) }, sym('settings'), '설정'));
 const backBar = () => header(h('button', { class: 'pf-action', onclick: goBack }, sym('arrow-left'), '목록'));
 const titleblock = (eyebrow, title, cls) => h('div', { class: 'pf-titleblock' },
