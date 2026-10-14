@@ -1,5 +1,5 @@
 // 앱 화면은 캐시해서 오프라인에서도 열리게 하고, 목록 데이터는 항상 네트워크를 먼저 확인한다.
-const CACHE = 'script-v21';
+const CACHE = 'script-v22';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest'];
 
 self.addEventListener('install', e => {
@@ -24,7 +24,7 @@ self.addEventListener('fetch', e => {
 
   // 네트워크 우선, 실패하면 캐시
   e.respondWith(
-    fetch(e.request)
+    fetch(e.request, { cache: 'no-cache' })  // 브라우저 임시 보관(HTTP 캐시)에 남은 옛 파일을 쓰지 않고 매번 서버에 확인한다
       .then(res => {
         if (res.ok) {
           const copy = res.clone();
