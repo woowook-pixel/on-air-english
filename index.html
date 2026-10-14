@@ -48,7 +48,7 @@
   .sc-arrow { flex: none; font: 700 14px/1 var(--pf-font); }
   .sc-row.playing .sc-title { font-weight: 800; }
   .sc-count { font: 700 11px/1 var(--pf-font); letter-spacing: 0.08em; color: var(--pf-gray); }
-  .pf-tabs { margin-bottom: 4px; }
+  .pf-tabs { margin-bottom: 4px; overflow-y: hidden; }
 
   /* ---------- 빈 상태 ---------- */
   .sc-empty { box-shadow: inset 0 1px 0 var(--pf-black); padding: 26px 0; }
@@ -90,6 +90,9 @@
   .sc-mini-label { font: 800 10px/1 var(--pf-font); letter-spacing: 0.12em; }
   .sc-mini-title { font: 500 14px/1.2 var(--pf-font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sc-mini .pf-action { flex: none; min-width: 56px; text-align: right; }
+
+  /* ---------- 레이아웃 진단 (주소 뒤에 ?layout-debug 를 붙였을 때만 보임) ---------- */
+  #ldebug { position: fixed; left: 0; top: 96px; z-index: 100; padding: 8px 10px; background: var(--pf-black); color: var(--pf-white); font: 11px/1.5 var(--pf-mono); white-space: pre; pointer-events: none; }
 
   /* ---------- 알림 ---------- */
   .sc-toast { position: fixed; left: var(--pf-side); right: var(--pf-side); bottom: calc(var(--pf-tabbar) + var(--sc-update-h, 0px) + 12px); padding: 14px 16px; background: var(--pf-black); color: var(--pf-white); font: 700 12px/1.4 var(--pf-font); letter-spacing: 0.04em; opacity: 0; pointer-events: none; z-index: 30; }
@@ -630,6 +633,32 @@ updateBar.querySelector('.pf-update-reload').addEventListener('click', async () 
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkVersion(); });
 setInterval(checkVersion, 5 * 60 * 1000);
 checkVersion();
+
+// ---------- 레이아웃 진단 ----------
+// 하단 바가 잘리는 문제를 기기에서 확인하려고 만든 읽기창. 주소 뒤에 ?layout-debug 를 붙여 열면 보이고, 평소에는 아무것도 하지 않는다.
+if (/[?&]layout-debug\b/.test(location.search)) {
+  const box = h('div', { id: 'ldebug' });
+  const probe = h('div', { style: 'position:fixed;visibility:hidden;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)' });
+  document.body.append(box, probe);
+  const r = e => { const x = e && e.getBoundingClientRect(); return x ? `${Math.round(x.top)}~${Math.round(x.bottom)} (h ${Math.round(x.height)})` : '-'; };
+  const draw = () => {
+    const vv = window.visualViewport, ps = getComputedStyle(probe), tb = document.querySelector('.pf-tabbar'), bt = tb && tb.querySelector('button span');
+    box.textContent = [
+      `inner ${innerWidth}x${innerHeight}  screen ${screen.width}x${screen.height}`,
+      `visualViewport ${vv ? Math.round(vv.width) + 'x' + Math.round(vv.height) + ' top ' + Math.round(vv.offsetTop) : '-'}`,
+      `html client ${document.documentElement.clientHeight}  scroll ${document.documentElement.scrollHeight}  y ${Math.round(scrollY)}`,
+      `safe top ${ps.paddingTop}  bottom ${ps.paddingBottom}`,
+      `standalone ${navigator.standalone === true}  dpr ${devicePixelRatio}`,
+      `tabbar ${r(tb)}`,
+      `tab text ${r(bt)}`,
+      `--pf-tabbar ${getComputedStyle(document.documentElement).getPropertyValue('--pf-tabbar').trim()}`,
+    ].join('\n');
+  };
+  draw();
+  ['resize', 'scroll'].forEach(t => window.addEventListener(t, draw));
+  if (window.visualViewport) ['resize', 'scroll'].forEach(t => window.visualViewport.addEventListener(t, draw));
+  setInterval(draw, 1000);
+}
 
 // ---------- 시작 ----------
 $('miniOpen').addEventListener('click', () => { if (!playerShown()) show(renderPlayer, true); });
