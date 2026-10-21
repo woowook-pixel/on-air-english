@@ -4,7 +4,7 @@
 
 ## 이 프로젝트
 
-앱 이름은 **Script**(구 On Air, 구 On Air Classic). 개인 앱 패밀리 공통 디자인을 따른다: 공통 파일은 `design/shared/`(자동 동기화, 직접 고치지 말 것)에서 같은 도메인으로 불러오고(적용 상태는 `design/APPLIED.md`), 이 앱 전용 기준은 `design/SCRIPT.md`. 흑백, 모서리 없음, 그림자·그라데이션 없음, Ember(#FF7A3D)는 "지금 재생 중" 표시에만 쓴다. 아이콘 원본은 `design/icons/script.svg`(복사본이 `icons/`에 있다).
+앱 이름은 **Script**(구 On Air, 구 On Air Classic). 개인 앱 패밀리 공통 디자인을 따른다: 공통 파일은 `design/shared/`(자동 동기화, 직접 고치지 말 것)에서 같은 도메인으로 불러오고(적용 상태는 `design/APPLIED.md`), 이 앱 전용 기준은 `design/SCRIPT.md`. 흑백, 모서리 없음, 그림자·그라데이션 없음, Ember(#FF7A3D)는 재생 화면의 진행 위치 막대에만 쓴다(미니 플레이어와 "음성" 라벨의 주황 점은 사용자 요청으로 뺐다). 아이콘 원본은 `design/icons/script.svg`(복사본이 `icons/`에 있다).
 
 영어 뉴스로 듣기·읽기를 공부하는 웹앱(PWA). 사용자는 아이폰 홈 화면에 설치해서 쓴다.
 

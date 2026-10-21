@@ -85,7 +85,6 @@
   .pf-screen { padding-bottom: calc(var(--pf-tabbar) + var(--sc-update-h, 0px) + 24px); }
   body.has-mini .pf-screen { padding-bottom: calc(var(--pf-tabbar) + var(--sc-update-h, 0px) + 56px + 24px); }
   .sc-mini-open { flex: 1; min-width: 0; height: 56px; display: flex; align-items: center; gap: 12px; }
-  .sc-dot { flex: none; width: 7px; height: 7px; background: var(--pf-ember); }
   .sc-mini-text { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
   .sc-mini-label { font: 800 10px/1 var(--pf-font); letter-spacing: 0.12em; }
   .sc-mini-title { font: 500 14px/1.2 var(--pf-font); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -105,7 +104,6 @@
 
 <div class="sc-mini" id="mini">
   <button class="sc-mini-open" id="miniOpen" aria-label="재생 화면 열기">
-    <span class="sc-dot" aria-hidden="true"></span>
     <span class="sc-mini-text"><span class="sc-mini-label">NOW PLAYING</span><span class="sc-mini-title" id="miniTitle"></span></span>
   </button>
   <button class="pf-action" id="miniPlay" aria-label="재생"><pf-sym name="play"></pf-sym>PLAY</button>
@@ -458,7 +456,7 @@ function renderPlayer() {
     h('div', { class: 'sc-info' },
       thumb(p, 96),
       h('div', { class: 'sc-meta' },
-        h('div', { class: 'pf-eyebrow pf-now' }, p.media === 'video' ? '영상' : '음성'),
+        h('div', { class: 'pf-eyebrow' }, p.media === 'video' ? '영상' : '음성'),
         h('div', { class: 'pf-row-sub' }, `${prettyShow(p.show)} · ${src(p).short}`))),
     h('h1', { class: 'sc-ptitle' }, p.title),
     bar,
