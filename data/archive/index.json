@@ -1,6 +1,23 @@
 {
  "editions": [
   {
+   "id": "2026-10-25",
+   "date": "2026-10-25",
+   "titles": [
+    "The Happy Pod: Lost my ring, found some friends",
+    "6pm ET, October 24 | The latest headlines from NPR",
+    "Websites Go Offline, Protests in France, Netflix Downsizes",
+    "How do we adapt to the cold?",
+    "Football is here – and so is a new study on CTE",
+    "Almost 1,000 arrested as clashes follow another day of mass protests across France",
+    "Ukraine says Starlink connection 'now stable' after network limits",
+    "Trains cancelled and road warnings as Storm Boelo sweeps into Scotland",
+    "UK to invest £100m in 'world first' AI Biosecurity Lab",
+    "Archdiocese of New York agrees to $800 million settlement over sexual abuse claims",
+    "Protests roil France once again as police seek to quell violence"
+   ]
+  },
+  {
    "id": "2026-10-24",
    "date": "2026-10-24",
    "titles": [
