@@ -1,6 +1,23 @@
 {
  "editions": [
   {
+   "id": "2026-11-01",
+   "date": "2026-11-01",
+   "titles": [
+    "The Happy Pod: Personalised cancer vaccine shows promise in major trial",
+    "7pm ET, October 31 | The latest headlines from NPR",
+    "Oil Earnings, Binance Heist, A MAHA Update",
+    "Rethinking dyslexia",
+    "AI-made viruses could be the future of medicine",
+    "'We came back from hell', say Ukrainians after years in Russia-occupied front-line city",
+    "Ukrainian evacuees reunite with family after years trapped in Russia-occupied city",
+    "'Fascinating' rare beetle found in Wales again after 60 years",
+    "Why North Korea's 'elite' hackers are the prime suspect in major Binance hack",
+    "Virginia and D.C. sue to block construction of Trump arch",
+    "Secretary Rubio has a tough time getting officials at G20 on the same page"
+   ]
+  },
+  {
    "id": "2026-10-31",
    "date": "2026-10-31",
    "titles": [
