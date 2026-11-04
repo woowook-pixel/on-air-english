@@ -1,6 +1,23 @@
 {
  "editions": [
   {
+   "id": "2026-11-04",
+   "date": "2026-11-04",
+   "titles": [
+    "Americans vote in pivotal midterm elections",
+    "7pm ET, November 03 | The latest headlines from NPR",
+    "Election Day, Trump's Closing Message, Iran War And The Midterms",
+    "What English phrases really mean",
+    "OpenAI whistleblowers on the fight over AI safety | Machine Gods",
+    "Spanish transport minister resigns days after deadly train crash",
+    "Seven flights across Europe targeted by suspected bomb threats",
+    "Prince William says UK faces terrifying risk of more wildfires due to climate change",
+    "Graduates are managing AI - but are they learning much else?",
+    "Jon Ossoff wins reelection in Georgia, easily defeating Republican Mike Collins",
+    "Japan faces diplomatic dilemma amid joint pressure from nuclear neighbors"
+   ]
+  },
+  {
    "id": "2026-11-03",
    "date": "2026-11-03",
    "titles": [
