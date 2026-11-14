@@ -1,6 +1,23 @@
 {
  "editions": [
   {
+   "id": "2026-11-14",
+   "date": "2026-11-14",
+   "titles": [
+    "Microsoft outage: Millions affected in over 70 countries",
+    "8pm ET, November 13 | The latest headlines from NPR",
+    "Nvidia's Future, Trump's Ties to Huang, US Mediates Russia-Ukraine Talks",
+    "Do you have good dining etiquette?",
+    "AI could help hospitals diagnose PTSD in real time",
+    "'Miracle on Mississippi' - All passengers rescued after New Orleans cruise ship collision",
+    "Microsoft 'deeply sorry' for global outage after almost 24 hours of disruption",
+    "Bluetongue virus confirmed on County Down farm",
+    "Even Grand Theft Auto's original creators haven't been able to play GTA 6",
+    "DHS head Markwayne Mullin says there is not a threat to the U.S. amid FAA ground stop",
+    "What's Trump's strategy now with Iran? To keep things as they are"
+   ]
+  },
+  {
    "id": "2026-11-13",
    "date": "2026-11-13",
    "titles": [
